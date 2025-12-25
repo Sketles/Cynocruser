@@ -1,0 +1,32 @@
+# ╔════════════════════════════════════════════════════════════════╗
+# ║                         GITIGNORE                              ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+# Credenciales
+.env
+
+# Dependencias
+node_modules/
+
+# Logs
+*.log
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# IDE/AI
+.claude/
+
+# ╔════════════════════════════════════════════════════════════════╗
+# ║                  DATOS PERSONALES SENSIBLES                    ║
+# ╚════════════════════════════════════════════════════════════════╝
+
+# Cassettes contienen información personal (identidad, lenguaje, configuración psicológica)
+core/cassettes/
+
+# Logs de prompts pueden contener datos sensibles
+scripts/promptconsole/
+
+# Documentación de investigación (puede contener info sensible)
+docs/

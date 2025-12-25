@@ -1,0 +1,438 @@
+{
+    "groq": {
+        "id": "groq",
+        "name": "Groq Systems",
+        "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+        "envKey": "GROQ_API_KEY",
+        "protocol": "openai",
+        "models": {
+            "groq/compound": {  
+                "context": 32768,
+                "cost": "$",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 250,
+                    "tpm": 70000,
+                    "tpd": "No limit"
+                }
+            },
+            "groq/compound-mini": {
+                "context": 32768,
+                "cost": "$",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 250,
+                    "tpm": 70000,
+                    "tpd": "No limit"
+                }
+            },
+            "llama-3.1-8b-instant": {
+                "context": 128000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 6000,
+                    "tpd": 500000
+                }
+            },
+            "llama-3.3-70b-versatile": {
+                "context": 128000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 12000,
+                    "tpd": 100000
+                }
+            },
+            "meta-llama/llama-4-maverick-17b-128e-instruct": {
+                "context": 131072,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 6000,
+                    "tpd": 500000
+                }
+            },
+            "meta-llama/llama-4-scout-17b-16e-instruct": {
+                "context": 131072,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 30000,
+                    "tpd": 500000
+                }
+            },
+            "meta-llama/llama-guard-4-12b": {
+                "context": 8192,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000,
+                    "tpd": 500000
+                }
+            },
+            "meta-llama/llama-prompt-guard-2-22m": {
+                "context": 8192,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000,
+                    "tpd": 500000
+                }
+            },
+            "meta-llama/llama-prompt-guard-2-86m": {
+                "context": 8192,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000,
+                    "tpd": 500000
+                }
+            },
+            "moonshotai/kimi-k2-instruct": {
+                "context": 32768,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 60,
+                    "rpd": 1000,
+                    "tpm": 10000,
+                    "tpd": 300000
+                }
+            },
+            "moonshotai/kimi-k2-instruct-0905": {
+                "context": 32768,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 60,
+                    "rpd": 1000,
+                    "tpm": 10000,
+                    "tpd": 300000
+                }
+            },
+            "openai/gpt-oss-120b": {
+                "context": 32768,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 8000,
+                    "tpd": 200000
+                }
+            },
+            "openai/gpt-oss-20b": {
+                "context": 32768,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 8000,
+                    "tpd": 200000
+                }
+            },
+            "openai/gpt-oss-safeguard-20b": {
+                "context": 32768,
+                "cost": "$",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1000,
+                    "tpm": 8000,
+                    "tpd": 200000
+                }
+            },
+            "qwen/qwen3-32b": {
+                "context": 32768,
+                "cost": "$",
+                "limits": {
+                    "rpm": 60,
+                    "rpd": 1000,
+                    "tpm": 6000,
+                    "tpd": 500000
+                }
+            },
+            "allam-2-7b": {
+                "context": 32768,
+                "cost": "$",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 7000,
+                    "tpm": 6000,
+                    "tpd": 500000
+                }
+            }
+        },
+        "defaultModel": "groq/compound"
+    },
+    "sambanova": {
+        "id": "sambanova",
+        "name": "SambaNova Cloud",
+        "endpoint": "https://api.sambanova.ai/v1/chat/completions",
+        "envKey": "SAMBANOVA_API_KEY",
+        "protocol": "openai",
+        "models": {
+            "DeepSeek-R1-0528": {
+                "context": 65536,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "DeepSeek-R1-Distill-Llama-70B": {
+                "context": 65536,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "DeepSeek-V3.1": {
+                "context": 65536,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "DeepSeek-V3.1-Terminus": {
+                "context": 65536,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "gpt-oss-120b": {
+                "context": 32768,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "Qwen3-235B": {
+                "context": 32768,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "Qwen3-32B": {
+                "context": 32768,
+                "cost": "Free",
+                "category": "Reasoning"
+            },
+            "ALLaM-7B-Instruct-preview": {
+                "context": 8192,
+                "cost": "Free",
+                "category": "Text"
+            },
+            "DeepSeek-V3-0324": {
+                "context": 65536,
+                "cost": "Free",
+                "category": "Text"
+            },
+            "Llama-3.3-Swallow-70B-Instruct-v0.4": {
+                "context": 8192,
+                "cost": "Free",
+                "category": "Text"
+            },
+            "Meta-Llama-3.1-8B-Instruct": {
+                "context": 8192,
+                "cost": "Free",
+                "category": "Text"
+            },
+            "Meta-Llama-3.3-70B-Instruct": {
+                "context": 8192,
+                "cost": "Free",
+                "category": "Text"
+            },
+            "Llama-4-Maverick-17B-128E-Instruct": {
+                "context": 131072,
+                "cost": "Free",
+                "category": "Image/Text"
+            },
+            "Whisper-Large-v3": {
+                "context": 0,
+                "cost": "Free (Beta)",
+                "category": "Audio/Text"
+            }
+        },
+        "defaultModel": "DeepSeek-V3.1"
+    },
+    "openrouter": {
+        "id": "openrouter",
+        "name": "OpenRouter",
+        "endpoint": "https://openrouter.ai/api/v1/chat/completions",
+        "envKey": "OPENROUTER_API_KEY",
+        "protocol": "openai",
+        "headers": {
+            "HTTP-Referer": "https://github.com/cynosure-project",
+            "X-Title": "Cynosure CLI"
+        },
+        "models": {
+            "google/gemini-2.0-flash-exp:free": {
+                "context": 1000000,
+                "cost": "$"
+            },
+            "google/gemini-exp-1206:free": {
+                "context": 1000000,
+                "cost": "$"
+            },
+            "meta-llama/llama-3.3-70b-instruct:free": {
+                "context": 128000,
+                "cost": "$"
+            },
+            "meta-llama/llama-4-scout:free": {
+                "context": 131072,
+                "cost": "$"
+            },
+            "meta-llama/llama-4-maverick:free": {
+                "context": 131072,
+                "cost": "$"
+            },
+            "deepseek/deepseek-r1:free": {
+                "context": 64000,
+                "cost": "$"
+            },
+            "qwen/qwen-2.5-72b-instruct:free": {
+                "context": 32768,
+                "cost": "$"
+            },
+            "nvidia/llama-3.1-nemotron-70b-instruct:free": {
+                "context": 128000,
+                "cost": "$"
+            },
+            "anthropic/claude-3.5-sonnet": {
+                "context": 200000,
+                "cost": "$$$"
+            },
+            "anthropic/claude-3-opus": {
+                "context": 200000,
+                "cost": "$$$$"
+            },
+            "openai/gpt-4o": {
+                "context": 128000,
+                "cost": "$$$"
+            },
+            "openai/o1-preview": {
+                "context": 128000,
+                "cost": "$$$$"
+            },
+            "x-ai/grok-2-1212": {
+                "context": 128000,
+                "cost": "$$$"
+            }
+        },
+        "defaultModel": "google/gemini-2.0-flash-exp:free"
+    },
+    "gemini": {
+        "id": "gemini",
+        "name": "Google Gemini (AI Studio)",
+        "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+        "envKey": "GEMINI_API_KEY",
+        "protocol": "gemini",
+        "models": {
+            "gemini-3-pro-preview": {
+                "context": 1000000,
+                "cost": "Paid ($0.50/1M in, $3/1M out)",
+                "limits": {
+                    "rpm": 10,
+                    "rpd": 1000,
+                    "tpm": 1000000
+                },
+                "released": "November 2025"
+            },
+            "gemini-3-flash-preview": {
+                "context": 1000000,
+                "cost": "Paid ($0.50/1M in, $3/1M out)",
+                "limits": {
+                    "rpm": 15,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                },
+                "released": "December 17, 2025"
+            },
+            "gemini-2.5-pro": {
+                "context": 1000000,
+                "cost": "Free (Limited)",
+                "limits": {
+                    "rpm": 5,
+                    "rpd": 100,
+                    "tpm": 250000
+                }
+            },
+            "gemini-2.5-flash": {
+                "context": 1000000,
+                "cost": "Free (Very Limited)",
+                "limits": {
+                    "rpm": 2,
+                    "rpd": 20,
+                    "tpm": 250000
+                }
+            },
+            "gemini-2.5-flash-lite": {
+                "context": 1000000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 1500,
+                    "tpm": 250000
+                }
+            },
+            "gemini-2.0-flash": {
+                "context": 1000000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 15,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            },
+            "gemini-2.0-flash-exp": {
+                "context": 1000000,
+                "cost": "Free (Experimental)",
+                "limits": {
+                    "rpm": 10,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            },
+            "gemini-2.0-flash-thinking-exp": {
+                "context": 1000000,
+                "cost": "Free (Experimental)",
+                "limits": {
+                    "rpm": 10,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            },
+            "gemini-1.5-pro": {
+                "context": 2000000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 2,
+                    "rpd": 50,
+                    "tpm": 32000
+                }
+            },
+            "gemini-1.5-flash": {
+                "context": 1000000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 15,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            },
+            "gemini-1.5-flash-8b": {
+                "context": 1000000,
+                "cost": "Free (Super Cheap)",
+                "limits": {
+                    "rpm": 15,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            },
+            "gemini-exp-1206": {
+                "context": 1000000,
+                "cost": "Free (Experimental)",
+                "limits": {
+                    "rpm": 10,
+                    "rpd": 1500,
+                    "tpm": 1000000
+                }
+            }
+        },
+        "defaultModel": "gemini-2.0-flash"
+    }
+}

@@ -1,0 +1,33 @@
+{
+  "name": "cynocruser",
+  "version": "2.0.0",
+  "description": "Ψ-Organ",
+  "main": "execute.js",
+  "scripts": {
+    "start": "node execute.js",
+    "dev": "node --watch execute.js",
+    "debug": "set DEBUG=true && node --watch execute.js",
+    "info": "node scripts/info.js",
+    "prompt:organ": "node scripts/organ.js",
+    "prompt:full": "node scripts/prompt.js",
+    "prompt:umwelt": "node scripts/umwelt.js"
+  },
+  "keywords": [
+    "ai",
+    "personality",
+    "psi-organ",
+    "gemini",
+    "cassettes",
+    "cognitive-system",
+    "cynocruser"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.0",
+    "yaml": "^2.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
