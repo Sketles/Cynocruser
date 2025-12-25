@@ -1,219 +1,418 @@
 // ╔════════════════════════════════════════════════════════════════╗
-// ║  WORLD SIMULATOR: Sistema Principal del Umwelt                 ║
+// ║  WORLD SIMULATOR: Proveedor de Contexto del Mundo              ║
 // ║                                                                ║
-// ║  Unifica TODO el contexto del mundo:                           ║
-// ║  - Fecha, hora, ubicación                                      ║
-// ║  - Clima real (Open-Meteo)                                     ║
-// ║  - Eventos especiales (Zeitgeist)                              ║
-// ║  - Percepciones sensoriales (templates)                        ║
-// ║                                                                ║  
-// ║  Config: cassettes/{cassette}/umwelt.yaml                      ║
+// ║  Recopila y estructura datos objetivos del entorno:            ║
+// ║  - Ubicación física (YAML)                                     ║
+// ║  - Clima actual (Open-Meteo API)                               ║
+// ║  - Momento temporal (hora, fecha, estación)                    ║
+// ║  - Rutina del día (según horario)                              ║
+// ║  - Eventos Zeitgeist (festividades, etc)                       ║
+// ║                                                                ║
+// ║  Output: Datos estructurados para <world_context> del prompt   ║
 // ╚════════════════════════════════════════════════════════════════╝
 
 const { Zeitgeist } = require('./zeitgeist');
 const { WeatherService, loadUmweltConfig } = require('./weatherService');
+const { UmweltNarrator } = require('./umweltNarrator');
 
-/**
- * WorldSimulator - Sistema unificado del Umwelt
- */
 class WorldSimulator {
     constructor() {
         const config = loadUmweltConfig();
 
+        // Guardar config completa para el PromptBuilder
+        this.fullConfig = config;
+
         this.location = config.location || {};
-        this.perceptions = config.perceptions || {};
+        this.apartment = config.apartment || {};
+        this.neighborhood = config.neighborhood || {};
+        this.daily_routine = config.daily_routine || {};
+
         this.zeitgeist = new Zeitgeist();
         this.weatherService = new WeatherService();
+        this.narrator = new UmweltNarrator();
     }
 
     // ════════════════════════════════════════════════════════════════
-    // CONTEXTO DEL MUNDO (reemplaza a Umwelt/world.js)
-    // ════════════════════════════════════════════════════════════════
-
-    /**
-     * Obtiene el contexto completo del mundo (para prompt-builder)
-     */
-    getWorldContext() {
-        const now = new Date();
-        const time = this._getCurrentTime(now);
-        const date = this._getCurrentDate(now);
-        const timeOfDay = this._getTimeOfDay(now);
-
-        return {
-            time,
-            date,
-            timeOfDay,
-            location: {
-                city: this.location.address?.city || this.location.city || 'Santiago',
-                country: this.location.address?.country || this.location.country || 'Chile',
-                comuna: this.location.address?.comuna || '',
-                description: this._formatLocationDescription()
-            },
-            promptContext: this._buildWorldPrompt(time, date, timeOfDay)
-        };
-    }
-
-    _getCurrentTime(now) {
-        const options = { timeZone: this.location.timezone || 'America/Santiago', hour: '2-digit', minute: '2-digit', hour12: false };
-        const formatted = now.toLocaleTimeString('es-CL', options);
-        const [hour, minute] = formatted.split(':').map(Number);
-        return { hour, minute, formatted };
-    }
-
-    _getCurrentDate(now) {
-        const options = { timeZone: this.location.timezone || 'America/Santiago', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-        const formatted = now.toLocaleDateString('es-CL', options);
-        const dayOfWeek = now.getDay();
-        return { formatted, dayOfWeek, isWeekend: dayOfWeek === 0 || dayOfWeek === 6 };
-    }
-
-    _getTimeOfDay(now) {
-        const hour = now.getHours();
-        const periods = [
-            { start: 0, end: 6, period: 'madrugada', emoji: '🌙', mood: 'muy cansado' },
-            { start: 6, end: 12, period: 'mañana', emoji: '☀️', mood: 'despertando' },
-            { start: 12, end: 14, period: 'mediodía', emoji: '🌞', mood: 'activo' },
-            { start: 14, end: 18, period: 'tarde', emoji: '🌤️', mood: 'normal' },
-            { start: 18, end: 21, period: 'atardecer', emoji: '🌆', mood: 'relajado' },
-            { start: 21, end: 24, period: 'noche', emoji: '🌙', mood: 'cansado' }
-        ];
-        return periods.find(p => hour >= p.start && hour < p.end) || periods[5];
-    }
-
-    _formatLocationDescription() {
-        const addr = this.location.address || {};
-        const parts = [];
-        if (addr.comuna) parts.push(addr.comuna);
-        if (addr.city && addr.city !== addr.comuna) parts.push(addr.city);
-        if (addr.country) parts.push(addr.country);
-
-        let desc = parts.join(', ');
-        if (addr.street && addr.number) desc += ` (${addr.street} #${addr.number})`;
-        return desc || 'Santiago, Chile';
-    }
-
-    _buildWorldPrompt(time, date, timeOfDay) {
-        const addr = this.location.address || {};
-        const locDesc = this._formatLocationDescription();
-
-        // Contexto extra del barrio (si existe)
-        const barrioInfo = this.neighborhood?.safety?.level ? `\n- Barrio: ${this.neighborhood.type || 'Población'}. ${this.neighborhood.safety.level}.` : '';
-
-        return `[MUNDO ACTUAL]
-- Ubicación: ${locDesc}
-- Fecha: ${date.formatted}
-- Hora: ${time.formatted} (${timeOfDay.period} ${timeOfDay.emoji})
-- Estado natural: ${timeOfDay.mood}${barrioInfo}${date.isWeekend ? '\n- Es fin de semana' : ''}`;
-    }
-
-    // ════════════════════════════════════════════════════════════════
-    // PERCEPCIONES SENSORIALES
+    // API PRINCIPAL: Generar contexto del mundo
     // ════════════════════════════════════════════════════════════════
 
     /**
-     * Genera snapshot completo del entorno
+     * Genera contexto completo del mundo para el prompt
      */
-    async generateSnapshot() {
+    async getWorldContext() {
         const now = new Date();
-        const zeitState = this.zeitgeist.getAmbientState();
-        const timeContext = this._getTimeContext(now);
 
-        // Clima real
+        // Datos temporales
+        const temporal = this._getTemporalContext(now);
+
+        // Clima actual
         let weather = null;
         try {
             weather = await this.weatherService.getCurrentWeather();
         } catch (e) {
-            console.warn('[WorldSimulator] Weather error:', e.message);
+            console.warn('[WorldSimulator] Weather API error:', e.message);
         }
 
-        const template = this._selectTemplate(zeitState, timeContext);
-        const stimuli = this._generateStimuli(template);
+        // Zeitgeist (eventos especiales)
+        const zeitState = this.zeitgeist.getAmbientState();
+
+        // Rutina actual según la hora
+        const currentRoutine = this._getCurrentRoutine(now);
+
+        // Calcular impacto fisiológico
+        const physiologicalImpact = this._calculatePhysiologicalImpact({
+            temporal,
+            weather,
+            currentRoutine,
+            zeitState
+        });
+
+        // Construir prompt context en YAML
+        const promptContext = this._buildPromptContextYAML({
+            temporal,
+            weather,
+            zeitState,
+            currentRoutine,
+            physiologicalImpact
+        });
+
+        // Generar narrativa fenomenológica (mini-IA)
+        const narrative = await this.narrator.generateNarrative({
+            location: this._getLocationData(),
+            temporal,
+            weather: weather ? this._formatWeatherData(weather) : null,
+            routine: currentRoutine,
+            zeitgeist: zeitState,
+            physiologicalImpact,
+            apartment: this.apartment,
+            neighborhood: this._getNeighborhoodContext(temporal)
+        }, this.fullConfig);  // ← Pasar config completa al PromptBuilder
 
         return {
-            timestamp: now.toISOString(),
-            context: {
-                event: zeitState.eventName || 'normal',
-                timeOfDay: timeContext.period,
-                dayOfWeek: timeContext.dayName
-            },
-            weather: weather ? {
-                temperature: weather.temperature,
-                condition: weather.conditionLocal,
-                effect: weather.effect
-            } : null,
-            stimuli,
-            atmosphere: zeitState.atmosphere,
-            neurosymbols: this._extractNeurosymbols(stimuli, zeitState),
-            promptContext: this._buildPerceptionPrompt(stimuli, zeitState, weather)
+            location: this._getLocationData(),
+            temporal,
+            weather: weather ? this._formatWeatherData(weather) : null,
+            routine: currentRoutine,
+            zeitgeist: zeitState,
+            neighborhood: this._getNeighborhoodContext(temporal),
+            apartment: this._getApartmentContext(),
+            physiologicalImpact,
+            narrative, // ← Relato fenomenológico generado
+            promptContext
         };
     }
 
-    _getTimeContext(date) {
+    // ════════════════════════════════════════════════════════════════
+    // DATOS DE UBICACIÓN
+    // ════════════════════════════════════════════════════════════════
+
+    _getLocationData() {
+        const addr = this.location.address || {};
+        return {
+            address: `${addr.street || ''} N°${addr.number || ''}, ${addr.comuna || ''}, ${addr.city || 'Santiago'}`,
+            coordinates: { lat: this.location.lat, lon: this.location.lon },
+            setting: this.location.context?.type || 'Departamento',
+            floor: this.location.context?.floor || 2
+        };
+    }
+
+    _getApartmentContext() {
+        return {
+            type: this.apartment.type || 'Departamento poblacional',
+            size: this.apartment.size_total || '~40-50 m²',
+            residents: this.apartment.residents || ['Pelao', 'Abuela'],
+            style: this.apartment.style?.vibe || 'Departamento de abuela chilena'
+        };
+    }
+
+    _getNeighborhoodContext(temporal) {
+        const hour = temporal.hour;
+        const isNight = hour >= 22 || hour < 6;
+
+        return {
+            type: this.neighborhood.type || 'Población urbana',
+            safety: this.neighborhood.safety?.level || 'Zona popular',
+            activity: this._getNeighborhoodActivity(hour, isNight)
+        };
+    }
+
+    _getNeighborhoodActivity(hour, isNight) {
+        if (hour >= 2 && hour < 6) return 'silencio profundo, casi nadie en la calle';
+        if (hour >= 6 && hour < 9) return 'gente yendo al trabajo, tráfico aumentando';
+        if (hour >= 9 && hour < 18) return 'actividad normal del día';
+        if (hour >= 18 && hour < 22) return 'gente regresando, más movimiento';
+        if (isNight) return 'actividad nocturna, algunos autos, perros ladrando';
+        return 'actividad normal';
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // PHYSIOLOGICAL IMPACT - Traducción a sensaciones corporales
+    // ════════════════════════════════════════════════════════════════
+
+    _calculatePhysiologicalImpact({ temporal, weather, currentRoutine, zeitState }) {
+        const hour = temporal.hour;
+        const impact = {
+            circadian_pressure: this._getCircadianPressure(hour),
+            thermal_comfort: this._getThermalComfort(weather),
+            energy_drain: this._getEnergyDrain(hour, currentRoutine),
+            social_affordances: this._getSocialAffordances(hour, zeitState),
+            arousal_modulation: this._getArousalLevel(hour, weather)
+        };
+
+        return impact;
+    }
+
+    _getCircadianPressure(hour) {
+        if (hour >= 1 && hour < 6) return { level: 'very_high', description: 'Cuerpo exige sueño, melatonina alta' };
+        if (hour >= 6 && hour < 9) return { level: 'medium', description: 'Despertar gradual, cortisol subiendo' };
+        if (hour >= 22 || hour === 0) return { level: 'high', description: 'Presión de sueño aumentando' };
+        return { level: 'low', description: 'Estado de alerta normal' };
+    }
+
+    _getThermalComfort(weather) {
+        if (!weather) return { comfort: 'neutral', description: 'Sin datos' };
+
+        const temp = weather.temperature;
+        if (temp < 10) return { comfort: 'cold', description: 'Frío percibido, necesidad de abrigo', affordance: 'Quedarse adentro' };
+        if (temp < 15) return { comfort: 'cool', description: 'Fresco, ligeramente incómodo', affordance: 'Ropa abrigada' };
+        if (temp > 28) return { comfort: 'hot', description: 'Calor, sudor, incomodidad', affordance: 'Buscar sombra/agua' };
+        return { comfort: 'pleasant', description: 'Temperatura agradable', affordance: 'No restringe acciones' };
+    }
+
+    _getEnergyDrain(hour, routine) {
+        // Trabajo drena energía
+        if (routine && routine.id === 'work') {
+            return { level: 'high', description: 'Jornada laboral agotadora (11 horas)', impact: 'Respuestas cortas, menos paciencia' };
+        }
+
+        // Madrugada drena por falta de sueño
+        if (hour >= 1 && hour < 6) {
+            return { level: 'critical', description: 'Privación de sueño, cognición reducida', impact: 'Irritable, monosilábico' };
+        }
+
+        // Post-trabajo
+        if (hour >= 18 && hour < 22) {
+            return { level: 'medium', description: 'Cansancio acumulado del día', impact: 'Busca descanso/placer' };
+        }
+
+        return { level: 'low', description: 'Energía normal', impact: 'Ninguno' };
+    }
+
+    _getSocialAffordances(hour, zeitState) {
+        const affordances = [];
+
+        // Discord disponible de noche
+        if (hour >= 22 || hour < 6) {
+            affordances.push({ action: 'Discord', availability: 'high', reason: 'Amigos nocturnos/internacionales online' });
+        }
+
+        // Familia disponible en día
+        if (hour >= 8 && hour < 22) {
+            affordances.push({ action: 'Familia', availability: 'medium', reason: 'Abuela despierta, posible interacción' });
+        }
+
+        // Silencio obligatorio de noche
+        if ((hour >= 23 || hour < 7) && zeitState.eventName !== 'fin_de_semana') {
+            affordances.push({ constraint: 'Silencio', reason: 'Abuela durmiendo, evitar ruido' });
+        }
+
+        return affordances;
+    }
+
+    _getArousalLevel(hour, weather) {
+        let arousal = 50; // Base
+
+        // Hora afecta arousal
+        if (hour >= 1 && hour < 6) arousal -= 30; // Muy bajo en madrugada
+        if (hour >= 10 && hour < 14) arousal += 20; // Pico diurno
+
+        // Clima afecta
+        if (weather && weather.conditionLocal.includes('lluvia')) arousal -= 10; // Lluvia baja arousal
+        if (weather && weather.temperature > 28) arousal += 15; // Calor aumenta irritabilidad
+
+        return Math.max(0, Math.min(100, arousal));
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // DATOS TEMPORALES
+    // ════════════════════════════════════════════════════════════════
+
+    _getTemporalContext(date) {
         const hour = date.getHours();
         const dayOfWeek = date.getDay();
+
         const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+            'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
 
-        let period = 'noche';
-        if (hour < 6) period = 'madrugada';
-        else if (hour < 12) period = 'mañana';
-        else if (hour < 14) period = 'mediodía';
-        else if (hour < 18) period = 'tarde';
-        else if (hour < 21) period = 'atardecer';
-
-        return { hour, dayOfWeek, dayName: days[dayOfWeek], period, isWorkday: dayOfWeek >= 1 && dayOfWeek <= 5 };
-    }
-
-    _selectTemplate(zeitState, timeContext) {
-        const map = { 'navidad': 'navidad_noche', 'año_nuevo': 'navidad_noche', 'viernes_noche': 'viernes_noche', 'madrugada': 'madrugada' };
-
-        if (zeitState.eventId && map[zeitState.eventId]) {
-            return this.perceptions[map[zeitState.eventId]] || this.perceptions.default;
-        }
-        if (timeContext.hour >= 0 && timeContext.hour < 5) return this.perceptions.madrugada || this.perceptions.default;
-        if (timeContext.isWorkday && timeContext.hour >= 9 && timeContext.hour < 18) return this.perceptions.dia_laboral || this.perceptions.default;
-
-        return this.perceptions.default || {};
-    }
-
-    _generateStimuli(template) {
-        const pick = (arr, n = 1) => arr?.length ? [...arr].sort(() => 0.5 - Math.random()).slice(0, n) : [];
         return {
-            visual: pick(template.visual, 2),
-            auditivo: pick(template.auditivo, 2),
-            olfativo: pick(template.olfativo, 1),
-            termico: pick(template.termico, 1)
+            datetime: date.toISOString(),
+            formatted: `${days[dayOfWeek]} ${date.getDate()} de ${months[date.getMonth()]} ${date.getFullYear()}`,
+            time: `${String(hour).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`,
+            hour,
+            dayOfWeek: days[dayOfWeek],
+            isWeekend: dayOfWeek === 0 || dayOfWeek === 6,
+            period: this._getPeriodOfDay(hour),
+            season: this._getSeason(date.getMonth() + 1)
         };
     }
 
-    _extractNeurosymbols(stimuli, zeitState) {
-        const symbols = [...(zeitState.symbols || [])];
-        const text = [...stimuli.visual, ...stimuli.auditivo, ...stimuli.olfativo, ...stimuli.termico].join(' ').toLowerCase();
-
-        if (text.includes('familia') || text.includes('gente') || text.includes('risas')) symbols.push('social_activity_nearby');
-        if (text.includes('silencio') || text.includes('oscuridad')) symbols.push('isolation');
-        if (text.includes('calor') || text.includes('sofocante')) symbols.push('physical_discomfort');
-
-        return [...new Set(symbols)];
+    _getPeriodOfDay(hour) {
+        if (hour >= 0 && hour < 6) return 'madrugada';
+        if (hour >= 6 && hour < 12) return 'mañana';
+        if (hour >= 12 && hour < 14) return 'mediodía';
+        if (hour >= 14 && hour < 18) return 'tarde';
+        if (hour >= 18 && hour < 21) return 'atardecer';
+        return 'noche';
     }
 
-    _buildPerceptionPrompt(stimuli, zeitState, weather) {
-        const lines = ['[PERCEPCIÓN SENSORIAL DEL ENTORNO]'];
+    _getSeason(month) {
+        if (month >= 12 || month <= 2) return 'verano';
+        if (month >= 3 && month <= 5) return 'otoño';
+        if (month >= 6 && month <= 8) return 'invierno';
+        return 'primavera';
+    }
 
-        if (weather) lines.push(`🌡️ Clima actual: ${weather.temperature}°C, ${weather.conditionLocal}. ${weather.effect?.description || ''}`);
-        if (stimuli.visual?.length) lines.push(`🪟 Por la ventana ves: ${stimuli.visual.join('. ')}.`);
-        if (stimuli.auditivo?.length) lines.push(`👂 Escuchas: ${stimuli.auditivo.join('. ')}.`);
-        if (stimuli.olfativo?.length && stimuli.olfativo[0] !== 'Neutral') lines.push(`👃 Percibes: ${stimuli.olfativo.join('. ')}.`);
+    // ════════════════════════════════════════════════════════════════
+    // RUTINA DEL DÍA
+    // ════════════════════════════════════════════════════════════════
 
-        if (zeitState.atmosphere) {
-            lines.push('', '[CÓMO TE AFECTA]');
-            lines.push(`Tu percepción está teñida por ${zeitState.atmosphere.feeling}.`);
-            if (zeitState.atmosphere.vulnerability) lines.push(`Nota: ${zeitState.atmosphere.vulnerability}.`);
+    _getCurrentRoutine(date) {
+        const hour = date.getHours();
+        const dayOfWeek = date.getDay();
+        const isWeekday = dayOfWeek >= 1 && dayOfWeek <= 5;
+
+        // Rutina de semana
+        if (isWeekday) {
+            if (hour >= 5 && hour < 6) return this._formatRoutine('prepare', 'Preparándose para el trabajo', 'Alarma sonó a las 5:30, preparándose');
+            if (hour >= 6 && hour < 7) return this._formatRoutine('commute', 'Van de la empresa lo busca', 'Viajando al aeropuerto');
+            if (hour >= 7 && hour < 18) return this._formatRoutine('work', 'Trabajando en el aeropuerto', 'Jornada laboral de 11 horas');
+            if (hour >= 18 && hour < 19) return this._formatRoutine('commute_back', 'Regresando a casa', 'Van lo deja en casa');
+            if (hour >= 19 && hour < 22) return this._formatRoutine('relax', 'Tiempo libre en casa', 'Viendo series, Discord, comiendo');
+            if (hour >= 22 || hour < 1) return this._formatRoutine('night_discord', 'Activo en Discord', 'Jugando o chateando con amigos');
+            if (hour >= 1 && hour < 5) return this._formatRoutine('sleep', 'Durmiendo', 'Debería estar durmiendo');
         }
+
+        // Fin de semana
+        if (hour >= 1 && hour < 10) return this._formatRoutine('sleep_weekend', 'Durmiendo (sin alarma)', 'Fin de semana, duerme hasta tarde');
+        if (hour >= 10 && hour < 22) return this._formatRoutine('weekend', 'Día libre', 'Puede estar con Chinita, jugando, o saliendo');
+        return this._formatRoutine('night_weekend', 'Noche de fin de semana', 'Más flexible, probablemente despierto');
+    }
+
+    _formatRoutine(id, activity, context) {
+        return { id, activity, context };
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // FORMATO DE DATOS
+    // ════════════════════════════════════════════════════════════════
+
+    _formatWeatherData(weather) {
+        return {
+            temperature: `${weather.temperature}°C`,
+            condition: weather.conditionLocal,
+            feel: weather.effect?.description || '',
+            isDay: weather.isDay
+        };
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // CONSTRUCCIÓN DEL PROMPT CONTEXT (YAML FORMAT)
+    // ════════════════════════════════════════════════════════════════
+
+    _buildPromptContextYAML({ temporal, weather, zeitState, currentRoutine, physiologicalImpact }) {
+        const lines = ['# WORLD CONTEXT (Umwelt)\n'];
+
+        // === TIEMPO Y ESTADO CIRCADIANO ===
+        lines.push('temporal:');
+        lines.push(`  datetime: "${temporal.formatted}, ${temporal.time}"`);
+        lines.push(`  period: ${temporal.period}`);
+        lines.push(`  season: ${temporal.season}`);
+        if (temporal.isWeekend) lines.push('  note: Fin de semana');
+
+        // Presión circadiana
+        const circ = physiologicalImpact.circadian_pressure;
+        lines.push(`  circadian_state: "${circ.description}"`);
+        lines.push('');
+
+        // === UBICACIÓN ===
+        const loc = this._getLocationData();
+        lines.push('location:');
+        lines.push(`  address: "${loc.address}"`);
+        lines.push(`  setting: "${loc.setting}"`);
+        lines.push('');
+
+        // === CLIMA Y CONFORT TÉRMICO ===
+        if (weather) {
+            const therm = physiologicalImpact.thermal_comfort;
+            lines.push('weather:');
+            lines.push(`  temperature: ${weather.temperature}`);
+            lines.push(`  condition: "${weather.conditionLocal}"`);
+            lines.push(`  feel: "${weather.effect?.description || ''}"`);
+            lines.push(`  bodily_impact: "${therm.description}"`);
+            if (therm.affordance) lines.push(`  affordance: "${therm.affordance}"`);
+            lines.push('');
+        }
+
+        // === RUTINA ACTUAL Y ENERGÍA ===
+        if (currentRoutine) {
+            const energyDrain = physiologicalImpact.energy_drain;
+            lines.push('current_state:');
+            lines.push(`  activity: "${currentRoutine.activity}"`);
+            lines.push(`  context: "${currentRoutine.context}"`);
+            lines.push(`  energy_drain: { level: ${energyDrain.level}, impact: "${energyDrain.impact}" }`);
+            lines.push('');
+        }
+
+        // === AFFORDANCES SOCIALES ===
+        const socialAff = physiologicalImpact.social_affordances;
+        if (socialAff.length > 0) {
+            lines.push('social_affordances:');
+            socialAff.forEach(aff => {
+                if (aff.action) {
+                    lines.push(`  - action: ${aff.action}`);
+                    lines.push(`    availability: ${aff.availability}`);
+                    lines.push(`    reason: "${aff.reason}"`);
+                } else if (aff.constraint) {
+                    lines.push(`  - constraint: "${aff.constraint}"`);
+                    lines.push(`    reason: "${aff.reason}"`);
+                }
+            });
+            lines.push('');
+        }
+
+        // === ZEITGEIST (Evento Especial) ===
+        if (zeitState.eventName) {
+            lines.push('zeitgeist:');
+            lines.push(`  event: ${zeitState.eventName}`);
+            if (zeitState.symbols?.length) {
+                lines.push(`  symbols: "${zeitState.symbols.join(', ')}"`);
+            }
+            if (zeitState.atmosphere) {
+                lines.push(`  atmosphere: "${zeitState.atmosphere.feeling}"`);
+            }
+            lines.push('');
+        }
+
+        // === NIVEL DE AROUSAL ===
+        lines.push('physiological_tone:');
+        lines.push(`  arousal: ${physiologicalImpact.arousal_modulation}/100`);
+        lines.push(`  interpretation: "${this._interpretArousal(physiologicalImpact.arousal_modulation)}"`);
 
         return lines.join('\n');
     }
 
-    // Compatibilidad con código antiguo
+    _interpretArousal(arousal) {
+        if (arousal < 30) return 'Muy bajo - letargo, respuestas lentas';
+        if (arousal < 50) return 'Bajo-medio - relajado, poco reactivo';
+        if (arousal < 70) return 'Medio-alto - alerta, responsivo';
+        return 'Muy alto - tenso, irritable, hiperactivo';
+    }
+
+    // ════════════════════════════════════════════════════════════════
+    // COMPATIBILIDAD CON CÓDIGO ANTIGUO
+    // ════════════════════════════════════════════════════════════════
+
     serialize() { return this.location; }
     restore(data) { if (data) this.location = data; }
 }

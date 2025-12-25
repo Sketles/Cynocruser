@@ -78,8 +78,8 @@ async function generateResponse(userMessage, userId = 'cli-user') {
     // Procesar input con Ψ-Organ
     const psiState = psiOrgan.process(userMessage, { userId });
 
-    // Construir system prompt
-    const systemPrompt = buildSystemPrompt(cassette, userId, psiState);
+    // Construir system prompt (ASYNC - carga clima y narrativa)
+    const systemPrompt = await buildSystemPrompt(cassette, userId, psiState);
 
     // DEBUG MODE: Muestra prompt completo y tokens cuando DEBUG=true
     const isDebug = process.env.DEBUG === 'true';

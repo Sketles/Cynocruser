@@ -1,120 +1,67 @@
 // ╔═════════════════════════════════════════════════════════════════════════════╗
-// ║                                                                             ║
-// ║                    C O N F I G U R A C I O N   I A                          ║
-// ║                                                                             ║
-// ║        Edita este archivo para cambiar el modelo de IA                      ║
-// ║                                                                             ║
-// ║   COSTO: $ = gratis, $$ = barato, $$$ = medio, $$$$ = caro                  ║
-// ║                                                                             ║
+// ║                      C O N F I G U R A C I O N   I A                        ║
 // ╚═════════════════════════════════════════════════════════════════════════════╝
 
-module.exports = {
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                     PROVIDERS & MODELS DISPONIBLES                        ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+// 
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║                                                                           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
+// GROQ
+//   groq/compound, groq/compound-mini, llama-3.1-8b-instant,
+//   llama-3.3-70b-versatile, meta-llama/llama-4-maverick-17b-128e-instruct,
+//   meta-llama/llama-4-scout-17b-16e-instruct, qwen/qwen3-32b, allam-2-7b
+// 
+// SAMBANOVA
+//   DeepSeek-R1-0528, DeepSeek-R1-Distill-Llama-70B, DeepSeek-V3.1,
+//   DeepSeek-V3.1-Terminus, Qwen3-235B, Qwen3-32B, gpt-oss-120b,
+//   Meta-Llama-3.3-70B-Instruct, Meta-Llama-3.1-8B-Instruct,
+//   Llama-4-Maverick-17B-128E-Instruct, ALLaM-7B-Instruct-preview
+// 
+// GEMINI
+//   gemini-2.0-flash, gemini-2.0-flash-exp, gemini-2.5-flash-lite,
+//   gemini-2.5-flash, gemini-2.5-pro, gemini-1.5-flash, gemini-1.5-flash-8b,
+//   gemini-1.5-pro, gemini-exp-1206
+// 
+// OPENROUTER
+//   google/gemini-2.0-flash-exp:free, google/gemini-exp-1206:free,
+//   meta-llama/llama-3.3-70b-instruct:free, meta-llama/llama-4-scout:free,
+//   meta-llama/llama-4-maverick:free, deepseek/deepseek-r1:free,
+//   qwen/qwen-2.5-72b-instruct:free, nvidia/llama-3.1-nemotron-70b-instruct:free
+//   anthropic/claude-3.5-sonnet ($$$), anthropic/claude-3-opus ($$$$),
+//   openai/gpt-4o ($$$), openai/o1-preview ($$$$), x-ai/grok-2-1212 ($$$)
 
+module.exports = {
     // ╔═══════════════════════════════════════════════════════════════════════╗
-    // ║                         PROVEEDOR ACTIVO                              ║
+    // ║                      IA PRINCIPAL (MOTHER-IA)                         ║
     // ╠═══════════════════════════════════════════════════════════════════════╣
-    // ║                                                                       ║
-    // ║   ┌─────────────┬───────────────────────────────────────────┬─────┐   ║
-    // ║   │ 'groq'      │ Ultra rapido, Llama 3/4                   │  $  │   ║
-    // ║   │ 'sambanova' │ Alta potencia, Llama 405B                 │  $  │   ║
-    // ║   │ 'deepseek'  │ Razonamiento profundo                     │  $  │   ║
-    // ║   │ 'openrouter'│ Gateway a TODOS los modelos               │ $$$ │   ║
-    // ║   │ 'gemini'    │ Google Gemini directo                     │  $  │   ║
-    // ║   └─────────────┴───────────────────────────────────────────┴─────┘   ║
-    // ║                                                                       ║
+    // ║   Esta es la IA principal que genera las respuestas del personaje     ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     provider: 'sambanova',
-
-
-    // ╔═══════════════════════════════════════════════════════════════════════╗
-    // ║                          MODELO ACTIVO                                ║
-    // ╠═══════════════════════════════════════════════════════════════════════╣
-    // ║                                                                       ║
-    // ║   GROQ                                                                ║
-    // ║   ┌────────────────────────────────────────┐                          ║
-    // ║   │ 'groq/compound'                        │                          ║
-    // ║   │ 'llama-3.3-70b-versatile'              │                          ║
-    // ║   │ 'llama-3.1-8b-instant'                 │                          ║
-    // ║   │ 'qwen/qwen3-32b'                       │                          ║
-    // ║   └────────────────────────────────────────┘                          ║
-    // ║                                                                       ║
-    // ║   SAMBANOVA                                                           ║
-    // ║   ┌────────────────────────────────────────┐                          ║
-    // ║   │ 'Qwen3-235B'                           │                          ║
-    // ║   │ 'Qwen3-32B'                            │                          ║
-    // ║   │ 'Meta-Llama-3.3-70B-Instruct'          │                          ║
-    // ║   │ 'Meta-Llama-3.1-8B-Instruct'           │                          ║
-    // ║   │ 'DeepSeek-V3.1'                        │                          ║
-    // ║   │ 'DeepSeek-R1-0528'                     │                          ║
-    // ║   │ 'Llama-4-Maverick-17B-128E-Instruct'   │                          ║
-    // ║   └────────────────────────────────────────┘                          ║
-    // ║                                                                       ║
-    // ║   OPENROUTER                                                          ║
-    // ║   ┌────────────────────────────────────────┐                          ║
-    // ║   │ 'google/gemini-2.0-flash-exp:free'     │                          ║
-    // ║   │ 'meta-llama/llama-3.3-70b-instruct:free│                          ║
-    // ║   │ 'deepseek/deepseek-r1:free'            │                          ║
-    // ║   │ 'qwen/qwen-2.5-72b-instruct:free'      │                          ║
-    // ║   │ 'anthropic/claude-3.5-sonnet'          │                          ║
-    // ║   │ 'openai/gpt-4o'                        │                          ║
-    // ║   └────────────────────────────────────────┘                          ║
-    // ║                                                                       ║
-    // ║   GEMINI                                                              ║
-    // ║   ┌────────────────────────────────────────┐                          ║
-    // ║   │ 'gemini-2.0-flash'                     │                          ║
-    // ║   │ 'gemini-2.5-flash'                     │                          ║
-    // ║   │ 'gemini-3-flash-preview'               │                          ║
-    // ║   │ 'gemini-1.5-pro'                       │                          ║
-    // ║   └────────────────────────────────────────┘                          ║
-    // ║                                                                       ║
-    // ╚═══════════════════════════════════════════════════════════════════════╝
-
     model: 'Meta-Llama-3.3-70B-Instruct',
 
+    maxTokens: 666,
+    topP: 0.88,
+    temperature: 0.7,
+    memorySize: 20,
+    useEmojis: false,
 
     // ╔═══════════════════════════════════════════════════════════════════════╗
-    // ║                       PARAMETROS DE GENERACION                        ║
+    // ║                      MINI-IA UMWELT (Narrativa)                       ║
+    // ╠═══════════════════════════════════════════════════════════════════════╣
+    // ║   Esta mini-IA genera relatos fenomenológicos del mundo circundante   ║
+    // ║   Si está deshabilitada, usa templates estáticos (más rápido/gratis)  ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
-
-    // ┌─────────────────────────────────────────────────────────────────────────┐
-    // │ Max Tokens (Largo de respuesta)                                         │
-    // │ 50-100: corto | 100-200: medio | 200-500: largo | 500+: muy largo       │
-    // └─────────────────────────────────────────────────────────────────────────┘
-    maxTokens: 500,
-
-    // ┌─────────────────────────────────────────────────────────────────────────┐
-    // │ Top-P (Nucleus Sampling) - Filtra qué palabras puede elegir             │
-    // │                                                                         │
-    // │ Ejemplo: Si la IA quiere decir "Hola ___", las opciones son:            │
-    // │   "weon" (40%), "bro" (30%), "amigo" (20%), "compadre" (10%)            │
-    // │                                                                         │
-    // │ Con topP=0.7: Solo puede elegir "weon" o "bro" (suman 70%)              │
-    // │ Con topP=1.0: Puede elegir cualquier palabra                            │
-    // │                                                                         │
-    // │ 0.5: muy conservador (solo las más probables)                           │
-    // │ 0.9: normal                                                             │
-    // │ 0.95: creativo (más variedad)                                           │
-    // │ 1.0: todo vale (puede elegir palabras raras)                            │
-    // └─────────────────────────────────────────────────────────────────────────┘
-    topP: 0.88,
-
-    // ┌─────────────────────────────────────────────────────────────────────────┐
-    // │ Temperature (Creatividad)                                               │
-    // │ 0.0-0.3: predecible, seguro | 0.4-0.7: balanceado | 0.8-1.0: random     │
-    // └─────────────────────────────────────────────────────────────────────────┘
-    temperature: 0.7,
-
-    // ┌─────────────────────────────────────────────────────────────────────────┐
-    // │ Memory Size (Historial de conversación)                                 │
-    // │ Cuántos mensajes recuerda: 10: corto | 20: normal | 50: largo           │
-    // └─────────────────────────────────────────────────────────────────────────┘
-    memorySize: 20,
-
-    // ┌─────────────────────────────────────────────────────────────────────────┐
-    // │ Use Emojis (Usar emojis en respuestas)                                  │
-    // └─────────────────────────────────────────────────────────────────────────┘
-    useEmojis: false
-
+    umwelt: {
+        enabled: true, //true or false to enable or disable umwelt-ia (narrative)
+        provider: 'groq',
+        model: 'groq/compound',
+        maxTokens: 666,
+        temperature: 0.8,
+        topP: 0.9
+    }
 };

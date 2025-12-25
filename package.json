@@ -10,7 +10,8 @@
     "info": "node scripts/info.js",
     "prompt:organ": "node scripts/organ.js",
     "prompt:full": "node scripts/prompt.js",
-    "prompt:umwelt": "node scripts/umwelt.js"
+    "prompt:umwelt": "node scripts/umwelt.js",
+    "test:ia": "node scripts/test-ai-providers.js"
   },
   "keywords": [
     "ai",

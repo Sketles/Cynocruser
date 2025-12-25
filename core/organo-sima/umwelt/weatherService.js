@@ -108,7 +108,7 @@ class WeatherService {
         const isDay = current.is_day === 1;
 
         const effect = this._getClimateEffect(temp);
-        const conditionLocal = this.weather.wmo_codes?.[weatherCode] || 'normal';
+        const conditionLocal = this._getLocalCondition(weatherCode, isDay);
 
         return {
             temperature: Math.round(temp),
@@ -120,6 +120,21 @@ class WeatherService {
             effect,
             promptDescription: `Afuera hace ${Math.round(temp)}°C (${conditionLocal}). ${effect?.description || ''}`
         };
+    }
+
+    _getLocalCondition(weatherCode, isDay) {
+        let condition = this.weather.wmo_codes?.[weatherCode] || 'normal';
+
+        // Adaptar descripciones según día/noche
+        if (!isDay) {
+            // Si menciona sol o despejado, usar descripción nocturna
+            if (condition.includes('sol') || condition.includes('despejado')) {
+                return 'cielo nocturno despejado';
+            }
+            // Otras condiciones se mantienen igual (lluvia, nublado, etc.)
+        }
+
+        return condition;
     }
 
     _getClimateEffect(temp) {

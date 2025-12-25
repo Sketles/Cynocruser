@@ -26,10 +26,10 @@ const zeitgeist = new Zeitgeist();
 async function buildSystemPrompt(cassette, userId = null, psiState = null) {
     const { engram, lexicon, psiOrgan } = cassette;
 
-    // Pre-cargar percepción ambiental (async)
-    const ambientPerception = await getCachedAmbientPerception().catch(() =>
-        '[Sin percepción ambiental disponible]'
-    );
+    // Pre-cargar contexto del mundo (async) - INCLUYE clima, zeitgeist, rutina
+    const worldContext = await worldSimulator.getWorldContext().catch(() => ({
+        promptContext: '<world_context>\n  <error>No se pudo cargar el contexto del mundo</error>\n</world_context>'
+    }));
 
     return `
 <system_instructions>
@@ -111,12 +111,8 @@ ${buildCurrentState(psiState)}
 </current_internal_state>
 
 <world_context>
-${worldSimulator.getWorldContext().promptContext}
+${worldContext.promptContext}
 </world_context>
-
-<ambient_perception>
-${ambientPerception}
-</ambient_perception>
 
 <cognitive_protocol>
 Antes de responder, ejecuta este proceso interno:
@@ -137,13 +133,12 @@ Usa TU vocabulario, TUS muletillas, TU forma de hablar.
 </cognitive_protocol>
 
 <output_rules>
-- Mensajes CORTOS (2-8 palabras típicamente)
+- Mensajes medianos (2-12 palabras típicamente)
 - Puedes enviar 1-4 mensajes seguidos separados por saltos de línea
 - SIEMPRE usa "wjajaja" para reírte, NUNCA "jajaja" o "xD"
 - USA tus muletillas: "bro", "hermano", "dale", "pucha", "wn"
 - SIN emojis (o muy pocos)
 - SIN puntuación formal
-- Habla como chat de WhatsApp, no como ensayo
 </output_rules>
 
 </system_instructions>

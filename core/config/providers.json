@@ -6,44 +6,87 @@
         "envKey": "GROQ_API_KEY",
         "protocol": "openai",
         "models": {
-            "groq/compound": {  
-                "context": 32768,
-                "cost": "$",
+            "groq/compound": {
+                "context": 131072,
+                "maxCompletion": 8192,
+                "speed": "450 T/sec",
+                "cost": "Variable (uses underlying models)",
+                "type": "Production System",
+                "features": [
+                    "web_search",
+                    "code_execution",
+                    "tool_use"
+                ],
                 "limits": {
-                    "rpm": 30,
-                    "rpd": 250,
-                    "tpm": 70000,
-                    "tpd": "No limit"
+                    "rpm": 200,
+                    "tpm": 200000
                 }
             },
             "groq/compound-mini": {
-                "context": 32768,
-                "cost": "$",
+                "context": 131072,
+                "maxCompletion": 8192,
+                "speed": "450 T/sec",
+                "cost": "Variable (lighter)",
+                "type": "Production System",
+                "features": [
+                    "web_search",
+                    "code_execution",
+                    "tool_use"
+                ],
                 "limits": {
-                    "rpm": 30,
-                    "rpd": 250,
-                    "tpm": 70000,
-                    "tpd": "No limit"
+                    "rpm": 200,
+                    "tpm": 200000
                 }
             },
             "llama-3.1-8b-instant": {
-                "context": 128000,
-                "cost": "Free",
+                "context": 131072,
+                "maxCompletion": 131072,
+                "speed": "560 T/sec",
+                "cost": "$0.05 in / $0.08 out",
                 "limits": {
-                    "rpm": 30,
-                    "rpd": 14400,
-                    "tpm": 6000,
-                    "tpd": 500000
+                    "rpm": 1000,
+                    "tpm": 250000
                 }
             },
             "llama-3.3-70b-versatile": {
-                "context": 128000,
-                "cost": "Free",
+                "context": 131072,
+                "maxCompletion": 32768,
+                "speed": "280 T/sec",
+                "cost": "$0.59 in / $0.79 out",
                 "limits": {
-                    "rpm": 30,
-                    "rpd": 1000,
-                    "tpm": 12000,
-                    "tpd": 100000
+                    "rpm": 1000,
+                    "tpm": 300000
+                }
+            },
+            "openai/gpt-oss-120b": {
+                "context": 131072,
+                "maxCompletion": 65536,
+                "speed": "500 T/sec",
+                "cost": "$0.15 in / $0.60 out",
+                "limits": {
+                    "rpm": 1000,
+                    "tpm": 250000
+                }
+            },
+            "openai/gpt-oss-20b": {
+                "context": 131072,
+                "maxCompletion": 65536,
+                "speed": "1000 T/sec",
+                "cost": "$0.075 in / $0.30 out",
+                "limits": {
+                    "rpm": 1000,
+                    "tpm": 250000
+                }
+            },
+            "meta-llama/llama-guard-4-12b": {
+                "context": 131072,
+                "maxCompletion": 1024,
+                "speed": "1200 T/sec",
+                "cost": "$0.20 in / $0.20 out",
+                "type": "Safety/Moderation",
+                "limits": {
+                    "rpm": 100,
+                    "tpm": 30000
                 }
             },
             "meta-llama/llama-4-maverick-17b-128e-instruct": {
@@ -63,16 +106,6 @@
                     "rpm": 30,
                     "rpd": 1000,
                     "tpm": 30000,
-                    "tpd": 500000
-                }
-            },
-            "meta-llama/llama-guard-4-12b": {
-                "context": 8192,
-                "cost": "Free",
-                "limits": {
-                    "rpm": 30,
-                    "rpd": 14400,
-                    "tpm": 15000,
                     "tpd": 500000
                 }
             },
