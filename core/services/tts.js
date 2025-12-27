@@ -46,10 +46,16 @@ async function humeTextToSpeech(text, options = {}) {
 
     console.log(`🗣️ [Hume TTS Octave 2] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
 
+    // Limpiar texto: eliminar saltos de línea que cortan el audio
+    const cleanText = text
+        .replace(/\n+/g, ', ')  // Reemplazar saltos de línea con comas
+        .replace(/\s+/g, ' ')   // Normalizar espacios
+        .trim();
+
     // Siempre usar Octave 2 (mejor calidad, no soporta description)
     const body = {
         utterances: [{
-            text: text,
+            text: cleanText,
             voice: { id: voiceId }
         }],
         format: { type: 'mp3' },
