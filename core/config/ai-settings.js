@@ -45,7 +45,7 @@ module.exports = {
 
     maxTokens: 500,
     topP: 0.88,
-    temperature: 0.7,
+    temperature: 0.88,
     memorySize: 20,
     useEmojis: false,
 
