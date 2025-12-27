@@ -71,9 +71,12 @@ class AIClient {
         }
 
         // 2. Determinar API Key (necesaria si cambiamos de provider)
-        let activeApiKey = this.apiKey;
+        let activeApiKey = settings.apiKey || this.apiKey;
         if (activeProviderId !== this.providerId || !activeApiKey) {
-            activeApiKey = this._resolveApiKey(activeProvider);
+            // Si settings.apiKey no está definido, resolver del provider
+            if (!settings.apiKey) {
+                activeApiKey = this._resolveApiKey(activeProvider);
+            }
         }
 
         // 3. Extraer System Prompt si viene aparte

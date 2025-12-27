@@ -58,9 +58,10 @@ module.exports = {
 
     umwelt: {
         enabled: true, //true or false to enable or disable umwelt-ia (narrative)
-        provider: 'groq',
-        model: 'groq/compound',
-        maxTokens: 1000,
+        provider: 'sambanova',
+        model: 'Meta-Llama-3.3-70B-Instruct',
+        apiKeyEnv: 'SAMBANOVA_API_KEY_UMWELT',
+        maxTokens: 500,
         temperature: 0.88,
         topP: 0.9
     }

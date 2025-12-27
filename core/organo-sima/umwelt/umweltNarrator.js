@@ -121,12 +121,16 @@ class UmweltNarrator {
      * Llama a la mini-IA con el prompt construido
      */
     async _callNarratorAI(userPrompt) {
+        // Resolver API Key específica si está configurada
+        const apiKey = this.config.apiKeyEnv ? process.env[this.config.apiKeyEnv] : null;
+
         const response = await this.aiClient.sendMessage([
             { role: 'system', content: this.systemPrompt }, // ← Propiedad de clase
             { role: 'user', content: userPrompt }
         ], {
             provider: this.config.provider,
             model: this.config.model,
+            apiKey: apiKey, // Pasar key específica
             temperature: this.config.temperature,
             topP: this.config.topP,
             maxTokens: this.config.maxTokens
