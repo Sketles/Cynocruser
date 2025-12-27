@@ -1,7 +1,8 @@
 // ╔════════════════════════════════════════════════════════════════╗
-// ║                      PROMPT BUILDER v3.0                       ║
+// ║                    PROMPT BUILDER v1  Somalia                  ║
 // ║             XML Structure + COMPLETE YAML Injection            ║
 // ║              Fase 1-3: TODOS LOS YAMLS COMPLETOS               ║
+// ║            (Versión pre-optimización Liu et al.)               ║
 // ╚════════════════════════════════════════════════════════════════╝
 
 const fs = require('fs');
@@ -1291,4 +1292,3 @@ module.exports = {
     buildUserContext,
     getCachedAmbientPerception  // Export para uso externo si es necesario
 };
-

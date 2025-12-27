@@ -2,7 +2,7 @@
 // ║  ZEITGEIST: Percepción Ambiental Pasiva                        ║
 // ║                                                                ║
 // ║  Detecta eventos especiales y genera atmósfera emocional       ║
-// ║  Configuración en: cassettes/{cassette}/umwelt.yaml            ║
+// ║  Configuración en: cassettes/{cassette}/core-umwelt.yaml       ║
 // ╚════════════════════════════════════════════════════════════════╝
 
 const { loadUmweltConfig } = require('../../services/weatherService');

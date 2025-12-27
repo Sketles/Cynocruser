@@ -13,13 +13,14 @@ const figlet = require('figlet');
 
 // Módulos Core
 const { loadCassette } = require('./core/loaders/cassetteLoader');
-const { buildSystemPrompt } = require('./core/builders/promptBuilder');
+const { buildSystemPrompt } = require('./core/builders');
 const { PsiOrgan } = require('./core/organo-sima');
 const { AIClient } = require('./core/services/ai-client');
 
 // Configuración
 const aiSettings = require('./core/config/ai-settings');
 const cassetteSettings = require('./core/config/cassette-settings');
+const promptSettings = require('./core/config/prompt-settings');
 const CHARACTER_ID = cassetteSettings.cassette;
 
 // Estado Global
@@ -106,7 +107,7 @@ async function initialize() {
     const characterBox = boxen(
         colors.ai.bold(characterName) + '\n\n' +
         colors.dim('Escribe tu mensaje y presiona Enter\n') +
-        colors.dim('Comandos: ') + colors.accent('/estado') + colors.dim(' | ') + colors.accent('/salir'),
+        colors.dim('Comandos: ') + colors.accent('/info') + colors.dim(' | ') + colors.accent('/estado') + colors.dim(' | ') + colors.accent('/help'),
         {
             padding: 1,
             margin: { top: 1, bottom: 1 },
@@ -182,6 +183,56 @@ function showState() {
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// MOSTRAR INFO DEL SISTEMA
+// ═══════════════════════════════════════════════════════════════════
+function showInfo() {
+    const activeBuilder = promptSettings.activeBuilder;
+    const builderConfig = promptSettings.builders[activeBuilder] || {};
+
+    const infoBox = boxen(
+        colors.secondary.bold('🤖 PROVEEDOR IA') + '\n' +
+        colors.dim('  Provider:  ') + colors.accent(aiSettings.provider) + '\n' +
+        colors.dim('  Modelo:    ') + colors.accent(aiSettings.model) + '\n' +
+        colors.dim('  Umwelt:    ') + colors.accent(aiSettings.umwelt?.provider || 'mismo') + '\n\n' +
+        colors.secondary.bold('📝 PROMPT BUILDER') + '\n' +
+        colors.dim('  Activo:    ') + colors.accent(activeBuilder) + '\n' +
+        colors.dim('  Archivo:   ') + colors.dim(builderConfig.file || 'N/A') + '\n' +
+        colors.dim('  Desc:      ') + colors.dim(builderConfig.description || '') + '\n\n' +
+        colors.secondary.bold('📼 CASSETTE') + '\n' +
+        colors.dim('  Personaje: ') + colors.accent(cassetteSettings.cassette),
+        {
+            padding: 1,
+            borderStyle: 'round',
+            borderColor: 'green',
+            title: '⚙️  Configuración del Sistema',
+            titleAlignment: 'center'
+        }
+    );
+    console.log('\n' + infoBox + '\n');
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MOSTRAR AYUDA
+// ═══════════════════════════════════════════════════════════════════
+function showHelp() {
+    const helpBox = boxen(
+        colors.accent('/info') + '     ' + colors.dim('Ver IA, PromptBuilder y Cassette') + '\n' +
+        colors.accent('/estado') + '   ' + colors.dim('Ver estado del Ψ-Organ (tanques)') + '\n' +
+        colors.accent('/clear') + '    ' + colors.dim('Limpiar pantalla') + '\n' +
+        colors.accent('/help') + '     ' + colors.dim('Mostrar esta ayuda') + '\n' +
+        colors.accent('/salir') + '    ' + colors.dim('Salir del programa'),
+        {
+            padding: 1,
+            borderStyle: 'round',
+            borderColor: 'blue',
+            title: '📚 Comandos Disponibles',
+            titleAlignment: 'center'
+        }
+    );
+    console.log('\n' + helpBox + '\n');
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // INTERFAZ CLI
 // ═══════════════════════════════════════════════════════════════════
 async function startCLI() {
@@ -220,6 +271,18 @@ async function startCLI() {
 
             if (userInput.toLowerCase() === '/clear') {
                 showBanner();
+                prompt();
+                return;
+            }
+
+            if (userInput.toLowerCase() === '/info' || userInput.toLowerCase() === '/config') {
+                showInfo();
+                prompt();
+                return;
+            }
+
+            if (userInput.toLowerCase() === '/help' || userInput.toLowerCase() === '/ayuda') {
+                showHelp();
                 prompt();
                 return;
             }

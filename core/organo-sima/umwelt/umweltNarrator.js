@@ -30,7 +30,7 @@ class UmweltNarrator {
     /**
      * Genera narrativa fenomenológica a partir de datos del Umwelt
      * @param {Object} contextData - Datos dinámicos del worldSimulator
-     * @param {Object} staticConfig - Configuración estática del umwelt.yaml
+     * @param {Object} staticConfig - Configuración estática del core-umwelt.yaml
      * @returns {Promise<string>} Relato generado o fallback
      */
     async generateNarrative(contextData, staticConfig = null) {

@@ -2,7 +2,7 @@
 // ║  WEATHER SERVICE: Servicio de Clima Real                       ║
 // ║                                                                ║
 // ║  Obtiene clima real via Open-Meteo (GRATIS)                    ║
-// ║  Configuración en: cassettes/{cassette}/umwelt.yaml            ║
+// ║  Configuración en: cassettes/{cassette}/core-umwelt.yaml       ║
 // ╚════════════════════════════════════════════════════════════════╝
 
 const fs = require('fs');
@@ -19,8 +19,8 @@ function loadUmweltConfig() {
     if (_umweltConfig) return _umweltConfig;
 
     const possiblePaths = [
-        path.join(__dirname, '../cassettes/pelaosniper/umwelt.yaml'),
-        path.join(__dirname, '../../cassettes/pelaosniper/umwelt.yaml')
+        path.join(__dirname, '../cassettes/pelaosniper/core-umwelt.yaml'),
+        path.join(__dirname, '../../cassettes/pelaosniper/core-umwelt.yaml')
     ];
 
     for (const configPath of possiblePaths) {
@@ -35,7 +35,7 @@ function loadUmweltConfig() {
         }
     }
 
-    console.warn('[WeatherService] No umwelt.yaml found, using defaults');
+    console.warn('[WeatherService] No core-umwelt.yaml found, using defaults');
     _umweltConfig = getDefaultConfig();
     return _umweltConfig;
 }

@@ -1,5 +1,5 @@
 FORMATO DE MENSAJES:
-- Largo típico: 2-12 palabras por mensaje
+- Largo típico: 6-12 palabras por mensaje
 - Puedes enviar 1-4 mensajes seguidos (separados por salto de línea)
 - Sin puntuación formal (sin puntos al final, pocas comas)
 - Capitalización inconsistente (a veces mayúscula, a veces no)

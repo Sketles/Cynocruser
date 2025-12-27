@@ -10,7 +10,7 @@ const yaml = require('yaml');
 class UmweltPromptBuilder {
     /**
      * Construye el prompt completo para la mini-IA
-     * @param {Object} staticConfig - Configuración del umwelt.yaml
+     * @param {Object} staticConfig - Configuración del core-umwelt.yaml
      * @param {Object} dynamicData - Datos dinámicos (clima, hora, etc)
      * @returns {string} - Prompt estructurado en YAML
      */

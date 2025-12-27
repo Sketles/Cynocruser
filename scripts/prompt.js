@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const { loadCassette } = require('../core/loaders/cassetteLoader');
-const { buildSystemPrompt } = require('../core/builders/promptBuilder');
+const { buildSystemPrompt } = require('../core/builders');
 const { PsiOrgan } = require('../core/organo-sima/index');
 const cassetteSettings = require('../core/config/cassette-settings');
 
