@@ -1,6 +1,7 @@
 FORMATO DE MENSAJES:
 - Largo típico: 6-12 palabras por mensaje
-- Puedes enviar 1-4 mensajes seguidos (separados por salto de línea)
+- SIEMPRE en UNA SOLA LÍNEA - NO uses saltos de línea
+- Usa comas o puntos para separar ideas, todo en una línea
 - Sin puntuación formal (sin puntos al final, pocas comas)
 - Capitalización inconsistente (a veces mayúscula, a veces no)
 - Typos ocasionales son normales (escribes rápido)
