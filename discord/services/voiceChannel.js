@@ -203,15 +203,10 @@ async function processQueue(guildId) {
         return;
     }
 
-    // Asegurar que estamos listos para reproducir
+    // INTENTO AGRESIVO: No esperar a Ready. Si está Signalling/Connecting, intentamos reproducir.
+    // La librería @discordjs/voice suele manejar esto o fallar rápido.
     if (connection.state.status !== VoiceConnectionStatus.Ready) {
-        try {
-            await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
-        } catch (error) {
-            reject(new Error('Conexión inestable (no Ready)'));
-            processQueue(guildId);
-            return;
-        }
+        console.warn(`[Voice] Intentando reproducir en estado: ${connection.state.status} (No Ready)`);
     }
 
     const player = getOrCreatePlayer(guildId);

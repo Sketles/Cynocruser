@@ -303,9 +303,16 @@ function createCommandHandler(character) {
             const userMessage = interaction.options.getString('texto');
 
             try {
+                console.log(`[Hablame] 1. Generando respuesta IA para: "${userMessage}"`);
                 const aiResponse = await generateResponse(character, interaction.user.id, userMessage);
+                console.log(`[Hablame] 2. Respuesta IA generada: "${aiResponse.substring(0, 50)}..."`);
+
+                console.log(`[Hablame] 3. Generando TTS...`);
                 const audioBuffer = await textToSpeech(aiResponse);
+                console.log(`[Hablame] 4. TTS generado (${audioBuffer.length} bytes). Reproduciendo...`);
+
                 await playAudio(guildId, audioBuffer);
+                console.log(`[Hablame] 5. Audio enviado a cola.`);
 
                 const embed = new EmbedBuilder()
                     .setColor(COLORS.voice)
