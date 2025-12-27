@@ -201,35 +201,42 @@ function createCommandHandler(character) {
             const psiState = psiOrgan.getFullState();
             const tanks = psiState.soma?.tanks || {};
 
-            // Formato compacto de tanques
-            const t = (v) => `${'█'.repeat(Math.floor((v||0)/20))}${'░'.repeat(5-Math.floor((v||0)/20))}`;
+            // Usar Embed para un look profesional
+            const embed = new EmbedBuilder()
+                .setColor(0x9B59B6)
+                .setTitle('CYNOCRUSER')
+                .setDescription('**Ψ-ORGAN & SOULKILLED PSEUDO INTELLECT**')
+                .addFields(
+                    { name: 'CASSETTE', value: `\`${character.cassetteId}\``, inline: true },
+                    { name: 'DISCORD', value: connected ? '🟢 Connected' : '🔴 Disconnected', inline: true },
+                    { name: '\u200B', value: '\u200B', inline: true },
+                    {
+                        name: 'Ψ-ORGAN TANKS',
+                        value: [
+                            `ENE \`${Math.round(tanks.energia || 0)}%\` | INT \`${Math.round(tanks.integridad || 0)}%\` | AFI \`${Math.round(tanks.afiliacion || 0)}%\``,
+                            `CER \`${Math.round(tanks.certeza || 0)}%\` | COM \`${Math.round(tanks.competencia || 0)}%\``
+                        ].join('\n'),
+                        inline: false
+                    },
+                    {
+                        name: 'MOTHER-IA',
+                        value: `\`${aiSettings.model || 'N/A'}\``,
+                        inline: true
+                    },
+                    {
+                        name: 'UMWELT-IA',
+                        value: `\`${aiSettings.umwelt?.model || 'N/A'}\``,
+                        inline: true
+                    },
+                    {
+                        name: 'TTS',
+                        value: `\`${(ttsSettings.provider || 'hume').toUpperCase()}\` (${ttsSettings.hume?.activeVoice || 'default'})`,
+                        inline: true
+                    }
+                )
+                .setFooter({ text: 'L1-Soma • L2-Thalamus • L3-Cortex • Hippocampus' });
 
-            const lines = [
-                '```',
-                '╔═══════════════════════════════════════════╗',
-                '║      ◈ C Y N O C R U S E R ◈             ║',
-                '║  Ψ-ORGAN & SOULKILLED PSEUDO INTELLECT   ║',
-                '╠═══════════════════════════════════════════╣',
-                `║ CASSETTE: ${character.cassetteId.padEnd(30)}║`,
-                '╠═══════════════════════════════════════════╣',
-                '║ YAML FILES                                ║',
-                `║  engram ${cassette?.engram ? '●' : '○'} | lexicon ${cassette?.lexicon ? '●' : '○'} | organ ${cassette?.psiOrgan ? '●' : '○'} | umwelt ● ║`,
-                '╠═══════════════════════════════════════════╣',
-                '║ Ψ-ORGAN (SiMA)                            ║',
-                `║  ENE ${t(tanks.energia)} INT ${t(tanks.integridad)} AFI ${t(tanks.afiliacion)}  ║`,
-                `║  CER ${t(tanks.certeza)} COM ${t(tanks.competencia)}              ║`,
-                `║  L1-Soma ● L2-Thal ● L3-Cortex ● Memory ● ║`,
-                '╠═══════════════════════════════════════════╣',
-                `║ MOTHER-IA: ${(aiSettings.model || 'N/A').substring(0,28).padEnd(28)} ║`,
-                `║ UMWELT-IA: ${(aiSettings.umwelt?.model || 'N/A').substring(0,28).padEnd(28)} ║`,
-                `║ TTS: ${(ttsSettings.provider || 'hume').toUpperCase()} (${ttsSettings.hume?.activeVoice || 'default'}) Octave 2       ║`,
-                '╠═══════════════════════════════════════════╣',
-                `║ DISCORD: ${connected ? '● CONNECTED' : '○ DISCONNECTED'}                       ║`,
-                '╚═══════════════════════════════════════════╝',
-                '```'
-            ];
-
-            return interaction.reply({ content: lines.join('\n'), ephemeral: true });
+            return interaction.reply({ embeds: [embed], ephemeral: true });
         }
 
         // ═══════════════════════════════════════════════════════════════
