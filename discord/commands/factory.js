@@ -14,7 +14,9 @@ const {
     PsiOrgan,
     AIClient,
     textToSpeech,
-    cassetteSettings
+    cassetteSettings,
+    aiSettings,
+    ttsSettings
 } = require('../../core');
 
 // Servicios locales de Discord
@@ -106,7 +108,7 @@ async function generateResponse(character, userId, userMessage) {
     const client = getAIClient();
     const response = await client.generateResponse(history, systemPrompt, {
         temperature: character.ai?.temperature || 0.9,
-        maxOutputTokens: character.ai?.maxTokens || 150
+        maxOutputTokens: character.ai?.maxTokens || 500
     });
 
     history.push({ role: 'assistant', content: response });
@@ -194,18 +196,68 @@ function createCommandHandler(character) {
         // ═══════════════════════════════════════════════════════════════
         if (subcommand === 'info') {
             const connected = isConnected(guildId);
+            const cassette = getCassette(character.cassetteId);
+            const psiOrgan = getPsiOrgan(guildId, character.cassetteId);
+            const psiState = psiOrgan.getFullState();
+
+            // Obtener tanques del Soma
+            const tanks = psiState.soma?.tanks || {};
+            const formatTank = (val) => {
+                const v = Math.round(val || 0);
+                const bar = '█'.repeat(Math.floor(v / 10)) + '░'.repeat(10 - Math.floor(v / 10));
+                return `${bar} ${v}%`;
+            };
+
+            // Construir display épico
             const lines = [
-                '```',
-                '═══════════════════════════════════════════════════════',
-                '           CYNOCRUSER - Ψ-ORGAN DISCORD BOT            ',
-                '═══════════════════════════════════════════════════════',
-                `│ PERSONAJE: ${character.name}`,
-                `│ CASSETTE:  ${character.cassetteId}`,
-                `│ VOICE:     ${connected ? '🟢 CONECTADO' : '⚪ DESCONECTADO'}`,
-                `│ MODEL:     ${character.ai?.model || 'gemini-2.0-flash'}`,
-                '═══════════════════════════════════════════════════════',
+                '```ansi',
+                '╔══════════════════════════════════════════════════════════════╗',
+                '║     [2;36m◈ C Y N O C R U S E R ◈[0m                                  ║',
+                '║      [2;35mΨ-ORGAN & SOULKILLED PSEUDO INTELLECT[0m                  ║',
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ CASSETTE MODULE[0m                                          ║',
+                `║    Cassette:  [2;32m${character.cassetteId.padEnd(42)}[0m║`,
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ CASSETTE YAML FILES[0m                                      ║',
+                `║    [2;36m├─[0m core-engram.yaml     ${cassette?.engram ? '[2;32m● LOADED[0m' : '[2;31m○ MISSING[0m'}                   ║`,
+                `║    [2;36m├─[0m core-lexicon.yaml    ${cassette?.lexicon ? '[2;32m● LOADED[0m' : '[2;31m○ MISSING[0m'}                   ║`,
+                `║    [2;36m├─[0m core-sima-organ.yaml ${cassette?.psiOrgan ? '[2;32m● LOADED[0m' : '[2;31m○ MISSING[0m'}                   ║`,
+                `║    [2;36m└─[0m core-umwelt.yaml     [2;32m● ACTIVE[0m                        ║`,
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ Ψ-ORGAN LAYERS (SiMA Architecture)[0m                       ║',
+                '║    [2;35mL1 HYPOTHALAMUS[0m (Soma/Hardware)                          ║',
+                `║       Energía:     ${formatTank(tanks.energia)}               ║`,
+                `║       Integridad:  ${formatTank(tanks.integridad)}               ║`,
+                `║       Afiliación:  ${formatTank(tanks.afiliacion)}               ║`,
+                `║       Certeza:     ${formatTank(tanks.certeza)}               ║`,
+                `║       Competencia: ${formatTank(tanks.competencia)}               ║`,
+                '║    [2;35mL2 THALAMUS[0m (Perception)        [2;32m● ACTIVE[0m                 ║',
+                '║    [2;35mL3 CORTEX[0m (Ego/Id/Superego)     [2;32m● ACTIVE[0m                 ║',
+                '║    [2;35mHIPPOCAMPUS[0m (Memory)            [2;32m● ACTIVE[0m                 ║',
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ UMWELT (World Simulation)[0m                                ║',
+                `║    Zeitgeist:    [2;32m● ACTIVE[0m                                   ║`,
+                `║    Weather:      [2;32m● ACTIVE[0m                                   ║`,
+                `║    Narrative AI: ${aiSettings.umwelt?.enabled ? '[2;32m● ENABLED[0m' : '[2;31m○ DISABLED[0m'}                                  ║`,
+                `║    Model:        [2;37m${(aiSettings.umwelt?.model || 'N/A').padEnd(38)}[0m║`,
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ MOTHER-IA (Main AI Engine)[0m                               ║',
+                `║    Provider:  [2;36m${(aiSettings.provider || 'N/A').toUpperCase().padEnd(42)}[0m║`,
+                `║    Model:     [2;37m${(aiSettings.model || 'N/A').padEnd(42)}[0m║`,
+                `║    Tokens:    [2;37m${String(aiSettings.maxTokens || 500).padEnd(42)}[0m║`,
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ TTS ENGINE (Voice Clone)[0m                                 ║',
+                `║    Provider:  [2;36m${(ttsSettings.provider || 'N/A').toUpperCase().padEnd(42)}[0m║`,
+                `║    Voice:     [2;37m${(ttsSettings.hume?.activeVoice || 'default').padEnd(42)}[0m║`,
+                `║    Octave:    [2;37m${'2 (High Quality)'.padEnd(42)}[0m║`,
+                '╠══════════════════════════════════════════════════════════════╣',
+                '║  [2;33m◆ DISCORD STATUS[0m                                           ║',
+                `║    Voice:     ${connected ? '[2;32m● CONNECTED[0m' : '[2;31m○ DISCONNECTED[0m'}                                  ║`,
+                `║    Guild:     [2;37m${(guildId || 'N/A').padEnd(42)}[0m║`,
+                '╚══════════════════════════════════════════════════════════════╝',
                 '```'
             ];
+
             return interaction.reply({ content: lines.join('\n'), ephemeral: true });
         }
 
