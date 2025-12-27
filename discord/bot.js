@@ -123,9 +123,23 @@ async function initialize() {
     client.on('interactionCreate', async interaction => {
         if (!interaction.isCommand()) return;
 
+        console.log(`🔹 Interacción recibida: /${interaction.commandName} ${interaction.options.getSubcommand(false) || ''}`);
+
         const handler = handlers.get(interaction.commandName);
         if (handler) {
-            await handler(interaction);
+            try {
+                await handler(interaction);
+            } catch (error) {
+                console.error('❌ Error ejecutando handler:', error);
+                if (!interaction.replied && !interaction.deferred) {
+                    await interaction.reply({ content: '❌ Error interno al ejecutar el comando.', ephemeral: true });
+                } else {
+                    await interaction.followUp({ content: '❌ Error interno al ejecutar el comando.', ephemeral: true });
+                }
+            }
+        } else {
+            console.warn(`⚠️ No handler found for ${interaction.commandName}`);
+            await interaction.reply({ content: '❌ Comando no reconocido internamente.', ephemeral: true });
         }
     });
 
