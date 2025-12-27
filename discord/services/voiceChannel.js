@@ -11,7 +11,8 @@ const {
     AudioPlayerStatus,
     VoiceConnectionStatus,
     NoSubscriberBehavior,
-    StreamType
+    StreamType,
+    entersState
 } = require('@discordjs/voice');
 const { Readable } = require('stream');
 
@@ -75,9 +76,15 @@ async function joinChannel(voiceChannel) {
         const player = getOrCreatePlayer(guildId);
         connection.subscribe(player);
 
-        connection.on(VoiceConnectionStatus.Ready, () => {
+        // Esperar a que la conexión esté LISTA antes de confirmar
+        try {
+            await entersState(connection, VoiceConnectionStatus.Ready, 20_000);
             console.log(`[Voice] ✅ Conexión READY en: ${voiceChannel.name}`);
-        });
+        } catch (error) {
+            console.error('[Voice] Timeout esperando READY:', error);
+            connection.destroy();
+            throw error;
+        }
 
         connection.on(VoiceConnectionStatus.Disconnected, () => {
             console.log('[Voice] Estado: Disconnected');
