@@ -1,14 +1,3 @@
-// ╔════════════════════════════════════════════════════════════════════╗
-// ║                    CYNOCRUSER - DISCORD BOT                        ║
-// ║                                                                    ║
-// ║   Bot de Discord con Ψ-Organ + Voz Clonada                         ║
-// ║   Arquitectura modular: importa solo de /core                      ║
-// ╚════════════════════════════════════════════════════════════════════╝
-
-require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
 
 // ╔════════════════════════════════════════════════════════════════════╗
 // ║                    CYNOCRUSER - DISCORD BOT                        ║
