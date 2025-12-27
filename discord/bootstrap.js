@@ -5,7 +5,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+const AdmZip = require('adm-zip');
 
 // URL de descarga directa de Google Drive
 const DRIVE_FILE_ID = '1dXFbKbAHmzsKAzF4X0ECkygclsFZBBJu';
@@ -56,21 +56,12 @@ async function downloadFromDrive(fileId, destPath) {
 }
 
 /**
- * Extrae zip usando tar (disponible en Railway) o unzip
+ * Extrae zip usando adm-zip (puro JavaScript, no requiere binarios)
  */
 function extractZip(zipPath, destDir) {
-    try {
-        // Intentar con unzip primero
-        execSync(`unzip -o "${zipPath}" -d "${destDir}"`, { stdio: 'pipe' });
-    } catch {
-        // Fallback: usar Node.js para extraer (requiere instalar alguna lib)
-        // Por ahora, intentar con tar si es compatible
-        try {
-            execSync(`tar -xf "${zipPath}" -C "${destDir}"`, { stdio: 'pipe' });
-        } catch (e) {
-            throw new Error('No se pudo extraer el zip. Ni unzip ni tar disponibles.');
-        }
-    }
+    const zip = new AdmZip(zipPath);
+    zip.extractAllTo(destDir, true);
+    console.log('📂 Extracción completada con adm-zip');
 }
 
 /**
