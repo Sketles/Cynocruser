@@ -1,10 +1,31 @@
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const { WorldSimulator } = require('../core/organo-sima/umwelt/worldSimulator');
 
 async function main() {
-    console.log('\n╔════════════════════════════════════════════════════════════════╗');
-    console.log('║           UMWELT - CONTEXTO DEL MUNDO                          ║');
-    console.log('╚════════════════════════════════════════════════════════════════╝\n');
+    // Buffer para guardar el log
+    let outputBuffer = '';
+    function log(msg = '') {
+        const cleanMsg = cleanString(msg);
+        console.log(cleanMsg);
+        outputBuffer += cleanMsg + '\n';
+    }
+
+    function cleanString(str) {
+        if (!str) return '';
+        // Normalizar saltos de línea y eliminar caracteres de control
+        // \x1B es ESC. Lo eliminamos globalmente para evitar secuencias ANSI rotas.
+        return str
+            .replace(/\r\n/g, '\n') // Windows -> Unix
+            .replace(/[\r\x0B\x0C]/g, '') // Eliminar CR y otros
+            .replace(/\x1B/g, '') // Eliminar ESC (radical)
+            .replace(/[\x00-\x09\x0E-\x1F\x7F]/g, ''); // Otros control chars
+    }
+
+    log('\n╔════════════════════════════════════════════════════════════════╗');
+    log('║           UMWELT - CONTEXTO DEL MUNDO                          ║');
+    log('╚════════════════════════════════════════════════════════════════╝\n');
 
     const worldSimulator = new WorldSimulator();
 
@@ -12,114 +33,135 @@ async function main() {
         const context = await worldSimulator.getWorldContext();
 
         // ============================================================
-        // PROMPT YAML (Lo que va a la IA)
+        // BLOQUE XML FINAL (Lo que recibe promptBuilder.js)
         // ============================================================
-        console.log(context.promptContext);
-        console.log('\n');
+        log('┌────────────────────────────────────────────────────────────────┐');
+        log('│  XML INYECTADO EN PROMPT (Simulación)                          │');
+        log('└────────────────────────────────────────────────────────────────┘\n');
 
-        // ============================================================
-        // NARRATIVA GENERADA (Mini-IA)
-        // ============================================================
-        if (context.narrative) {
-            console.log('┌────────────────────────────────────────────────────────────────┐');
-            console.log('│  NARRATIVA FENOMENOLÓGICA (generada por IA)                    │');
-            console.log('└────────────────────────────────────────────────────────────────┘\n');
-            console.log(context.narrative);
-            console.log('\n');
-        }
+        const xmlBlock = `
+<world_context>
+${cleanString(context.promptContext)}
+
+<phenomenological_narrative>
+${cleanString(context.narrative) || 'Sin narrativa disponible'}
+</phenomenological_narrative>
+</world_context>`;
+
+        log(xmlBlock);
+        log('\n');
 
         // ============================================================
         // PHYSIOLOGICAL IMPACT DESGLOSADO
         // ============================================================
-        console.log('┌────────────────────────────────────────────────────────────────┐');
-        console.log('│  PHYSIOLOGICAL IMPACT (Impacto Corporal)                       │');
-        console.log('└────────────────────────────────────────────────────────────────┘\n');
+        log('┌────────────────────────────────────────────────────────────────┐');
+        log('│  PHYSIOLOGICAL IMPACT (Impacto Corporal)                       │');
+        log('└────────────────────────────────────────────────────────────────┘\n');
 
         const phys = context.physiologicalImpact;
 
         // Presión Circadiana
-        console.log('CIRCADIAN PRESSURE:');
-        console.log(`  Level: ${phys.circadian_pressure.level}`);
-        console.log(`  Desc:  ${phys.circadian_pressure.description}\n`);
+        log('CIRCADIAN PRESSURE:');
+        log(`  Level: ${phys.circadian_pressure.level}`);
+        log(`  Desc:  ${phys.circadian_pressure.description}\n`);
 
         // Confort Térmico
-        console.log('THERMAL COMFORT:');
-        console.log(`  Comfort: ${phys.thermal_comfort.comfort}`);
-        console.log(`  Desc:    ${phys.thermal_comfort.description}`);
+        log('THERMAL COMFORT:');
+        log(`  Comfort: ${phys.thermal_comfort.comfort}`);
+        log(`  Desc:    ${phys.thermal_comfort.description}`);
         if (phys.thermal_comfort.affordance) {
-            console.log(`  Action:  ${phys.thermal_comfort.affordance}`);
+            log(`  Action:  ${phys.thermal_comfort.affordance}`);
         }
-        console.log('');
+        log('');
 
         // Drenaje de Energía
-        console.log('ENERGY DRAIN:');
-        console.log(`  Level:  ${phys.energy_drain.level}`);
-        console.log(`  Desc:   ${phys.energy_drain.description}`);
-        console.log(`  Impact: ${phys.energy_drain.impact}\n`);
+        log('ENERGY DRAIN:');
+        log(`  Level:  ${phys.energy_drain.level}`);
+        log(`  Desc:   ${phys.energy_drain.description}`);
+        log(`  Impact: ${phys.energy_drain.impact}\n`);
 
         // Affordances Sociales
-        console.log('SOCIAL AFFORDANCES:');
+        log('SOCIAL AFFORDANCES:');
         if (phys.social_affordances.length === 0) {
-            console.log('  (ninguna)\n');
+            log('  (ninguna)\n');
         } else {
             phys.social_affordances.forEach(aff => {
                 if (aff.action) {
-                    console.log(`  + ${aff.action} (${aff.availability})`);
-                    console.log(`    -> ${aff.reason}`);
+                    log(`  + ${aff.action} (${aff.availability})`);
+                    log(`    -> ${aff.reason}`);
                 } else if (aff.constraint) {
-                    console.log(`  - ${aff.constraint}`);
-                    console.log(`    -> ${aff.reason}`);
+                    log(`  - ${aff.constraint}`);
+                    log(`    -> ${aff.reason}`);
                 }
             });
-            console.log('');
+            log('');
         }
 
         // Nivel de Arousal
-        console.log('AROUSAL MODULATION:');
-        console.log(`  Level: ${phys.arousal_modulation}/100`);
+        log('AROUSAL MODULATION:');
+        log(`  Level: ${phys.arousal_modulation}/100`);
 
         if (phys.arousal_modulation < 30) {
-            console.log('  Estado: MUY BAJO - Letargo, respuestas lentas');
+            log('  Estado: MUY BAJO - Letargo, respuestas lentas');
         } else if (phys.arousal_modulation < 50) {
-            console.log('  Estado: BAJO-MEDIO - Relajado, poco reactivo');
+            log('  Estado: BAJO-MEDIO - Relajado, poco reactivo');
         } else if (phys.arousal_modulation < 70) {
-            console.log('  Estado: MEDIO-ALTO - Alerta, responsivo');
+            log('  Estado: MEDIO-ALTO - Alerta, responsivo');
         } else {
-            console.log('  Estado: MUY ALTO - Tenso, irritable, hiperactivo');
+            log('  Estado: MUY ALTO - Tenso, irritable, hiperactivo');
         }
-        console.log('');
+        log('');
 
         // ============================================================
         // DATOS BÁSICOS
         // ============================================================
-        console.log('┌────────────────────────────────────────────────────────────────┐');
-        console.log('│  DATOS BÁSICOS                                                 │');
-        console.log('└────────────────────────────────────────────────────────────────┘\n');
+        log('┌────────────────────────────────────────────────────────────────┐');
+        log('│  DATOS BÁSICOS                                                 │');
+        log('└────────────────────────────────────────────────────────────────┘\n');
 
-        console.log(`Ubicación:      ${context.location.address}`);
-        console.log(`Tipo:           ${context.apartment.type}`);
-        console.log(`Tamaño:         ${context.apartment.size}`);
+        log(`Ubicación:      ${context.location.address}`);
+        log(`Tipo:           ${context.apartment.type}`);
+        log(`Tamaño:         ${context.apartment.size}`);
 
         if (context.weather) {
-            console.log(`\nTemperatura:    ${context.weather.temperature}`);
-            console.log(`Condición:      ${context.weather.condition}`);
-            console.log(`Sensación:      ${context.weather.feel}`);
+            log(`\nTemperatura:    ${context.weather.temperature}`);
+            log(`Condición:      ${context.weather.condition}`);
+            log(`Sensación:      ${context.weather.feel}`);
         }
 
-        console.log(`\nRutina:         ${context.routine?.activity || 'N/A'}`);
-        console.log(`Contexto:       ${context.routine?.context || 'N/A'}`);
+        log(`\nRutina:         ${context.routine?.activity || 'N/A'}`);
+        log(`Contexto:       ${context.routine?.context || 'N/A'}`);
 
         if (context.zeitgeist?.eventName) {
-            console.log(`\nEvento:         ${context.zeitgeist.eventName}`);
+            log(`\nEvento:         ${context.zeitgeist.eventName}`);
             if (context.zeitgeist.symbols) {
-                console.log(`Símbolos:       ${context.zeitgeist.symbols.join(', ')}`);
+                log(`Símbolos:       ${context.zeitgeist.symbols.join(', ')}`);
             }
             if (context.zeitgeist.atmosphere) {
-                console.log(`Atmósfera:      ${context.zeitgeist.atmosphere.feeling}`);
+                log(`Atmósfera:      ${context.zeitgeist.atmosphere.feeling}`);
             }
         }
 
-        console.log('\n');
+        log('\n');
+
+        // ============================================================
+        // GUARDAR A ARCHIVO
+        // ============================================================
+        const trashDir = path.join(__dirname, 'promptconsole');
+        if (!fs.existsSync(trashDir)) {
+            fs.mkdirSync(trashDir, { recursive: true });
+        }
+
+        const existingFiles = fs.readdirSync(trashDir)
+            .filter(f => f.startsWith('UmweltPrompt') && f.endsWith('.txt'));
+        const nextNumber = existingFiles.length + 1;
+
+        const fileName = `UmweltPrompt${nextNumber}.txt`;
+        const outputPath = path.join(trashDir, fileName);
+        fs.writeFileSync(outputPath, outputBuffer, 'utf8');
+
+        console.log(`  ✅ Log guardado → scripts/promptconsole/${fileName}`);
+        console.log('');
 
     } catch (error) {
         console.error('ERROR generando contexto:', error.message);

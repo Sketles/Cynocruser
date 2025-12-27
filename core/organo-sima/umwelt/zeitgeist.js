@@ -5,7 +5,7 @@
 // ║  Configuración en: cassettes/{cassette}/umwelt.yaml            ║
 // ╚════════════════════════════════════════════════════════════════╝
 
-const { loadUmweltConfig } = require('./weatherService');
+const { loadUmweltConfig } = require('../../services/weatherService');
 
 /**
  * Clase Zeitgeist - Detecta contexto temporal/cultural

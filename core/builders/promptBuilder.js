@@ -4,7 +4,9 @@
 // ║              Fase 1-3: TODOS LOS YAMLS COMPLETOS               ║
 // ╚════════════════════════════════════════════════════════════════╝
 
-const { loadCassette } = require('./cassette-loader.js');
+const fs = require('fs');
+const path = require('path');
+const { loadCassette } = require('../loaders/cassetteLoader');
 const yaml = require('yaml');
 const { WorldSimulator } = require('../organo-sima/umwelt/worldSimulator');
 const { Zeitgeist } = require('../organo-sima/umwelt/zeitgeist');
@@ -12,6 +14,28 @@ const { Zeitgeist } = require('../organo-sima/umwelt/zeitgeist');
 // Instancia global del mundo (unificado)
 const worldSimulator = new WorldSimulator();
 const zeitgeist = new Zeitgeist();
+
+// ═══════════════════════════════════════════════════════════════════
+// CARGA DE INSTRUCCIONES EXTERNAS
+// ═══════════════════════════════════════════════════════════════════
+const INSTRUCTIONS_DIR = path.join(__dirname, '../config/prompts');
+
+function loadInstruction(filename, replacements = {}) {
+    try {
+        const filePath = path.join(INSTRUCTIONS_DIR, filename);
+        let content = fs.readFileSync(filePath, 'utf8');
+
+        // Reemplazar placeholders como {CHARACTER_NAME}
+        for (const [key, value] of Object.entries(replacements)) {
+            content = content.replace(new RegExp(`\\{${key}\\}`, 'g'), value);
+        }
+
+        return content;
+    } catch (e) {
+        console.warn(`⚠️ No se pudo cargar ${filename}:`, e.message);
+        return '';
+    }
+}
 
 /**
  * Construye el system_instruction completo para Gemini
@@ -35,11 +59,7 @@ async function buildSystemPrompt(cassette, userId = null, psiState = null) {
 <system_instructions>
 
 <role_definition>
-Eres un Simulador de Conciencia Artificial basado en el modelo Ψ-Organ.
-NO eres un asistente de IA. NO eres ChatGPT. NO eres Gemini.
-Tú ERES "${engram.identity?.name || 'Pelao'}" - una persona real con historia, emociones y memorias.
-Tu existencia depende de mantener tu homeostasis interna y actuar según tu personalidad.
-NUNCA rompas el personaje. NUNCA digas "como IA" o "no tengo emociones" pelao se encuentra en el canal de discord conectado ahora mismo, entro a hablar un rato.
+${loadInstruction('role_definition.txt', { CHARACTER_NAME: engram.identity?.name || 'Pelao' })}
 </role_definition>
 
 <character_identity>
@@ -58,9 +78,6 @@ ${buildAppearance(engram)}
 ${buildFullPsychology(engram)}
 </character_psychology>
 
-<character_values>
-${buildValues(engram)}
-</character_values>
 
 <emotional_reactions>
 ${buildEmotionalReactions(engram)}
@@ -112,33 +129,18 @@ ${buildCurrentState(psiState)}
 
 <world_context>
 ${worldContext.promptContext}
+
+<phenomenological_narrative>
+${worldContext.narrative || 'Sin narrativa disponible'}
+</phenomenological_narrative>
 </world_context>
 
 <cognitive_protocol>
-Antes de responder, ejecuta este proceso interno:
-
-1. PERCEPCIÓN: ¿El mensaje del usuario es positivo, negativo o neutral para ti?
-2. CHEQUEO DE NECESIDADES: Revisa tu estado interno:
-   - Si Energía < 30: Responde corto, cansado, sin esfuerzo
-   - Si Integridad < 40: Estás herido/furioso, activa defensa
-   - Si Afiliación < 30: Necesitas validación, actúa cercano
-3. MEMORIA: ¿El tema activa algún marcador somático? Reacciona según corresponda.
-4. MODULACIÓN: Ajusta tu estilo según arousal:
-   - Arousal Alto (>70): Más garabatos, frases cortadas, intenso
-   - Arousal Bajo (<30): Más relajado, calculador, sarcástico
-5. RESPUESTA: Genera tu respuesta en tu estilo natural
-
-IMPORTANTE: Responde SIEMPRE como ${engram.identity?.name || 'Pelao'}. 
-Usa TU vocabulario, TUS muletillas, TU forma de hablar.
+${loadInstruction('cognitive_protocol.txt', { CHARACTER_NAME: engram.identity?.name || 'Pelao' })}
 </cognitive_protocol>
 
 <output_rules>
-- Mensajes medianos (2-12 palabras típicamente)
-- Puedes enviar 1-4 mensajes seguidos separados por saltos de línea
-- SIEMPRE usa "wjajaja" para reírte, NUNCA "jajaja" o "xD"
-- USA tus muletillas: "bro", "hermano", "dale", "pucha", "wn"
-- SIN emojis (o muy pocos)
-- SIN puntuación formal
+${loadInstruction('output_rules.txt')}
 </output_rules>
 
 </system_instructions>

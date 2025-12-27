@@ -3,7 +3,7 @@
 // ║            Carga personajes desde cassettes YAML               ║
 // ╚════════════════════════════════════════════════════════════════╝
 
-const { loadCassette, extractSomaticMarkers } = require('./cassette-loader');
+const { loadCassette, extractSomaticMarkers } = require('./cassetteLoader');
 const cassetteSettings = require('../config/cassette-settings');
 const aiSettings = require('../config/ai-settings');
 

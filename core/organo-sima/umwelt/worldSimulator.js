@@ -12,7 +12,7 @@
 // ╚════════════════════════════════════════════════════════════════╝
 
 const { Zeitgeist } = require('./zeitgeist');
-const { WeatherService, loadUmweltConfig } = require('./weatherService');
+const { WeatherService, loadUmweltConfig } = require('../../services/weatherService');
 const { UmweltNarrator } = require('./umweltNarrator');
 
 class WorldSimulator {
@@ -67,8 +67,8 @@ class WorldSimulator {
             zeitState
         });
 
-        // Construir prompt context en YAML
-        const promptContext = this._buildPromptContextYAML({
+        // Construir prompt context en TEXTO PLANO
+        const promptContext = this._buildPromptContextText({
             temporal,
             weather,
             zeitState,
@@ -317,87 +317,83 @@ class WorldSimulator {
     }
 
     // ════════════════════════════════════════════════════════════════
-    // CONSTRUCCIÓN DEL PROMPT CONTEXT (YAML FORMAT)
+    // CONSTRUCCIÓN DEL PROMPT CONTEXT (TEXTO PLANO)
     // ════════════════════════════════════════════════════════════════
 
-    _buildPromptContextYAML({ temporal, weather, zeitState, currentRoutine, physiologicalImpact }) {
-        const lines = ['# WORLD CONTEXT (Umwelt)\n'];
+    _buildPromptContextText({ temporal, weather, zeitState, currentRoutine, physiologicalImpact }) {
+        const lines = [];
 
-        // === TIEMPO Y ESTADO CIRCADIANO ===
-        lines.push('temporal:');
-        lines.push(`  datetime: "${temporal.formatted}, ${temporal.time}"`);
-        lines.push(`  period: ${temporal.period}`);
-        lines.push(`  season: ${temporal.season}`);
-        if (temporal.isWeekend) lines.push('  note: Fin de semana');
-
-        // Presión circadiana
+        // === CONTEXTO TEMPORAL ===
+        lines.push('CONTEXTO TEMPORAL:');
+        lines.push(`- Fecha: ${temporal.formatted}, ${temporal.time}`);
+        lines.push(`- Período: ${temporal.period}`);
+        lines.push(`- Estación: ${temporal.season}`);
+        if (temporal.isWeekend) lines.push('- Nota: Fin de semana');
         const circ = physiologicalImpact.circadian_pressure;
-        lines.push(`  circadian_state: "${circ.description}"`);
+        lines.push(`- Estado circadiano: ${circ.description}`);
         lines.push('');
 
         // === UBICACIÓN ===
         const loc = this._getLocationData();
-        lines.push('location:');
-        lines.push(`  address: "${loc.address}"`);
-        lines.push(`  setting: "${loc.setting}"`);
+        lines.push('UBICACIÓN:');
+        lines.push(`- Dirección: ${loc.address}`);
+        lines.push(`- Setting: ${loc.setting}`);
         lines.push('');
 
-        // === CLIMA Y CONFORT TÉRMICO ===
+        // === CLIMA ===
         if (weather) {
             const therm = physiologicalImpact.thermal_comfort;
-            lines.push('weather:');
-            lines.push(`  temperature: ${weather.temperature}`);
-            lines.push(`  condition: "${weather.conditionLocal}"`);
-            lines.push(`  feel: "${weather.effect?.description || ''}"`);
-            lines.push(`  bodily_impact: "${therm.description}"`);
-            if (therm.affordance) lines.push(`  affordance: "${therm.affordance}"`);
+            lines.push('CLIMA:');
+            lines.push(`- Temperatura: ${weather.temperature}°C`);
+            lines.push(`- Condición: ${weather.conditionLocal}`);
+            lines.push(`- Sensación: ${weather.effect?.description || 'Normal'}`);
+            lines.push(`- Impacto corporal: ${therm.description}`);
+            if (therm.affordance) lines.push(`- Affordance: ${therm.affordance}`);
             lines.push('');
         }
 
-        // === RUTINA ACTUAL Y ENERGÍA ===
+        // === ESTADO ACTUAL ===
         if (currentRoutine) {
             const energyDrain = physiologicalImpact.energy_drain;
-            lines.push('current_state:');
-            lines.push(`  activity: "${currentRoutine.activity}"`);
-            lines.push(`  context: "${currentRoutine.context}"`);
-            lines.push(`  energy_drain: { level: ${energyDrain.level}, impact: "${energyDrain.impact}" }`);
+            lines.push('ESTADO ACTUAL:');
+            lines.push(`- Actividad: ${currentRoutine.activity}`);
+            lines.push(`- Contexto: ${currentRoutine.context}`);
+            lines.push(`- Nivel energía: ${energyDrain.level}`);
+            lines.push(`- Impacto: ${energyDrain.impact}`);
             lines.push('');
         }
 
         // === AFFORDANCES SOCIALES ===
         const socialAff = physiologicalImpact.social_affordances;
         if (socialAff.length > 0) {
-            lines.push('social_affordances:');
+            lines.push('AFFORDANCES SOCIALES:');
             socialAff.forEach(aff => {
                 if (aff.action) {
-                    lines.push(`  - action: ${aff.action}`);
-                    lines.push(`    availability: ${aff.availability}`);
-                    lines.push(`    reason: "${aff.reason}"`);
+                    lines.push(`- ${aff.action}: ${aff.availability} (${aff.reason})`);
                 } else if (aff.constraint) {
-                    lines.push(`  - constraint: "${aff.constraint}"`);
-                    lines.push(`    reason: "${aff.reason}"`);
+                    lines.push(`- Restricción: ${aff.constraint} (${aff.reason})`);
                 }
             });
             lines.push('');
         }
 
-        // === ZEITGEIST (Evento Especial) ===
+        // === ZEITGEIST ===
         if (zeitState.eventName) {
-            lines.push('zeitgeist:');
-            lines.push(`  event: ${zeitState.eventName}`);
+            lines.push('ZEITGEIST:');
+            lines.push(`- Evento: ${zeitState.eventName}`);
             if (zeitState.symbols?.length) {
-                lines.push(`  symbols: "${zeitState.symbols.join(', ')}"`);
+                lines.push(`- Símbolos: ${zeitState.symbols.join(', ')}`);
             }
             if (zeitState.atmosphere) {
-                lines.push(`  atmosphere: "${zeitState.atmosphere.feeling}"`);
+                lines.push(`- Atmósfera: ${zeitState.atmosphere.feeling}`);
             }
             lines.push('');
         }
 
-        // === NIVEL DE AROUSAL ===
-        lines.push('physiological_tone:');
-        lines.push(`  arousal: ${physiologicalImpact.arousal_modulation}/100`);
-        lines.push(`  interpretation: "${this._interpretArousal(physiologicalImpact.arousal_modulation)}"`);
+        // === TONO FISIOLÓGICO ===
+        lines.push('TONO FISIOLÓGICO:');
+        lines.push(`- Arousal: ${physiologicalImpact.arousal_modulation}/100`);
+        lines.push(`- Interpretación: ${this._interpretArousal(physiologicalImpact.arousal_modulation)}`);
 
         return lines.join('\n');
     }

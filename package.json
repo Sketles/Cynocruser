@@ -11,7 +11,8 @@
     "prompt:organ": "node scripts/organ.js",
     "prompt:full": "node scripts/prompt.js",
     "prompt:umwelt": "node scripts/umwelt.js",
-    "test:ia": "node scripts/test-ai-providers.js"
+    "test:ia": "node scripts/test-ai-providers.js",
+    "release": "node scripts/release.js"
   },
   "keywords": [
     "ai",
@@ -25,7 +26,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "boxen": "^5.1.2",
+    "chalk": "^4.1.2",
     "dotenv": "^17.2.0",
+    "figlet": "^1.9.4",
+    "ora": "^5.4.1",
     "yaml": "^2.8.0"
   },
   "engines": {

@@ -28,11 +28,12 @@ const TEST_SUITE = {
         'Llama-4-Maverick-17B-128E-Instruct'
     ],
     gemini: [
-        'gemini-2.0-flash-exp',
-        'gemini-2.0-flash',
-        'gemini-2.5-flash-lite',
-        'gemini-1.5-flash-8b',
-        'gemini-exp-1206'
+        // Modelos verificados Diciembre 2025 - Google AI Studio
+        'gemini-2.5-flash',           // Fast, cost-effective (principal)
+        'gemini-2.5-flash-lite',      // Ultra-fast, mobile optimized
+        'gemini-2.5-pro',             // Powerful reasoning
+        'gemini-3-flash-preview',     // Gemini 3 (preview phase)
+        'gemini-2.0-flash'            // Previous gen
     ],
     openrouter: [
         // Gratuitos (verificados desde API)
@@ -108,7 +109,7 @@ async function testProvider(provider, models, stats) {
 }
 
 async function runAllTests() {
-    console.log(`${colors.bold}🚀 AI MODEL CONNECTIVITY TEST${colors.reset}`);
+    console.log(`${colors.bold}I MODEL CONNECTIVITY TEST${colors.reset}`);
     console.log(`${colors.gray}Testing top 5 models per provider...${colors.reset}`);
 
     const stats = { ok: 0, fail: 0, errors: {} };
@@ -136,7 +137,7 @@ async function runAllTests() {
         }
     }
 
-    console.log(`\n${colors.bold}✨ DONE${colors.reset}`);
+    console.log(`\n${colors.bold}DONE${colors.reset}`);
 }
 
 runAllTests().catch(console.error);

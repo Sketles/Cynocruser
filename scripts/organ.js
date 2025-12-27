@@ -10,7 +10,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const { loadCassette } = require('../core/data/cassette-loader');
+const { loadCassette } = require('../core/loaders/cassetteLoader');
 const { PsiOrgan } = require('../core/organo-sima/index');
 const { Umwelt, WorldSimulator } = require('../core/organo-sima/umwelt/worldSimulator');
 const cassetteSettings = require('../core/config/cassette-settings');

@@ -14,18 +14,21 @@ const path = require('path');
 const yaml = require('yaml');
 
 /**
- * Carga la configuración de mappings desde YAML
+ * Carga la configuración de mappings desde core-sima-organ.yaml
  */
 function loadTankMappings(cassettePath) {
-    const mappingsPath = path.join(cassettePath, 'tank-mappings.yaml');
+    const simaOrganPath = path.join(cassettePath, 'core-sima-organ.yaml');
 
-    if (!fs.existsSync(mappingsPath)) {
-        console.warn('[HomeostaticMiddleware] tank-mappings.yaml not found, using defaults');
+    if (!fs.existsSync(simaOrganPath)) {
+        console.warn('[HomeostaticMiddleware] core-sima-organ.yaml not found, using defaults');
         return getDefaultMappings();
     }
 
-    const content = fs.readFileSync(mappingsPath, 'utf8');
-    return yaml.parse(content);
+    const content = fs.readFileSync(simaOrganPath, 'utf8');
+    const config = yaml.parse(content);
+
+    // Mappings están en stimulus_mappings o tanks (backwards compat)
+    return config.stimulus_mappings || { tanks: config.tanks } || getDefaultMappings();
 }
 
 /**

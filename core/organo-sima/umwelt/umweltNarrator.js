@@ -9,7 +9,7 @@ const fs = require('fs');
 const path = require('path');
 const { AIClient } = require('../../services/ai-client');
 const aiSettings = require('../../config/ai-settings');
-const { UmweltPromptBuilder } = require('./umweltPromptBuilder');
+const { UmweltPromptBuilder } = require('../../builders/umweltPromptBuilder');
 
 class UmweltNarrator {
     constructor() {
@@ -19,7 +19,7 @@ class UmweltNarrator {
 
         // Cargar System Prompt desde archivo
         try {
-            const promptPath = path.join(__dirname, 'prompts', 'narrator-system.txt');
+            const promptPath = path.join(__dirname, '../../config/prompts/umwelt-prompt', 'narrator-system.txt');
             this.systemPrompt = fs.readFileSync(promptPath, 'utf8');
         } catch (e) {
             console.warn('⚠️ No se pudo cargar narrator-system.txt, usando default.');

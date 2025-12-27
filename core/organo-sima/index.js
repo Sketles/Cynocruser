@@ -110,8 +110,8 @@ class PsiOrgan {
         // 5. Registrar en memoria con cambios somáticos
         this._recordExperience(userInput, percepcion, egoResult);
 
-        // 6. Construir system prompt dinámico
-        const systemPrompt = this._buildDynamicPrompt(egoResult);
+        // 6. Construir system prompt dinámico (async por worldContext)
+        const systemPrompt = await this._buildDynamicPrompt(egoResult);
 
         // 7. Consumir energía por la acción
         this.soma.consumeAction();
@@ -208,7 +208,7 @@ class PsiOrgan {
     /**
      * Construye el prompt dinámico completo
      */
-    _buildDynamicPrompt(egoResult) {
+    async _buildDynamicPrompt(egoResult) {
         const parts = [];
 
         // 1. Base del personaje (si existe)
@@ -216,8 +216,8 @@ class PsiOrgan {
             parts.push(this.baseSystemPrompt);
         }
 
-        // 2. Contexto del mundo (Umwelt)
-        const worldContext = this.umwelt.getWorldContext();
+        // 2. Contexto del mundo (Umwelt) - async
+        const worldContext = await this.umwelt.getWorldContext().catch(() => ({ promptContext: '' }));
         parts.push('\n--- CONTEXTO DEL MUNDO ---\n');
         parts.push(worldContext.promptContext);
 

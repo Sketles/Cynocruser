@@ -10,8 +10,8 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const { loadCassette } = require('../core/data/cassette-loader');
-const { buildSystemPrompt } = require('../core/data/prompt-builder');
+const { loadCassette } = require('../core/loaders/cassetteLoader');
+const { buildSystemPrompt } = require('../core/builders/promptBuilder');
 const { PsiOrgan } = require('../core/organo-sima/index');
 const cassetteSettings = require('../core/config/cassette-settings');
 

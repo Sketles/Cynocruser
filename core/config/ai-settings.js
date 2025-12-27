@@ -43,7 +43,7 @@ module.exports = {
     provider: 'sambanova',
     model: 'Meta-Llama-3.3-70B-Instruct',
 
-    maxTokens: 666,
+    maxTokens: 500,
     topP: 0.88,
     temperature: 0.7,
     memorySize: 20,
@@ -60,8 +60,8 @@ module.exports = {
         enabled: true, //true or false to enable or disable umwelt-ia (narrative)
         provider: 'groq',
         model: 'groq/compound',
-        maxTokens: 666,
-        temperature: 0.8,
+        maxTokens: 1000,
+        temperature: 0.88,
         topP: 0.9
     }
 };
