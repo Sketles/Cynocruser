@@ -27,7 +27,7 @@ module.exports = {
         },
 
         v1f1: {
-            file: 'promptBuilder-V1-F1-Somalia.js',
+            file: 'promptBuilderV1F1-Somalia.js',
             description: 'V1 curado 8.5% de reducción de tokens y redundancias',
             lines: '~1260',
             features: [

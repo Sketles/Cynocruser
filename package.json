@@ -1,11 +1,13 @@
 {
   "name": "cynocruser",
   "version": "2.0.0",
-  "description": "Ψ-Organ",
+  "description": "Ψ-Organ - AI Character Engine with Discord Bot",
   "main": "execute.js",
   "scripts": {
     "start": "node execute.js",
+    "bot": "node discord/bot.js",
     "dev": "node --watch execute.js",
+    "dev:bot": "node --watch discord/bot.js",
     "debug": "set DEBUG=true && node --watch execute.js",
     "info": "node scripts/info.js",
     "prompt:organ": "node scripts/organ.js",
@@ -21,16 +23,26 @@
     "gemini",
     "cassettes",
     "cognitive-system",
-    "cynocruser"
+    "cynocruser",
+    "discord",
+    "voice-clone"
   ],
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@discordjs/opus": "^0.10.0",
+    "@discordjs/rest": "^2.3.0",
+    "@discordjs/voice": "^0.19.0",
     "boxen": "^5.1.2",
     "chalk": "^4.1.2",
+    "discord-api-types": "^0.37.93",
+    "discord.js": "^14.15.3",
     "dotenv": "^17.2.0",
+    "ffmpeg-static": "^5.3.0",
     "figlet": "^1.9.4",
+    "libsodium-wrappers": "^0.7.15",
     "ora": "^5.4.1",
+    "prism-media": "^1.3.5",
     "yaml": "^2.8.0"
   },
   "engines": {
