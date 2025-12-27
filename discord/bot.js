@@ -94,7 +94,8 @@ async function initialize() {
         cassetteId: cassetteId,
         name: cassette.engram.identity?.name || 'AI',
         fullName: cassette.engram.identity?.full_name || '',
-        commandName: cassetteId.toLowerCase().replace(/[^a-z0-9]/g, ''),
+        // FORZAR COMANDO "pelao"
+        commandName: 'pelao',
         commandDescription: `Habla con ${cassette.engram.identity?.name || 'AI'}`,
         ai: {
             model: 'gemini-2.0-flash',
@@ -106,12 +107,6 @@ async function initialize() {
     // 6. Generar comandos
     commands = [createCommandDefinition(identity)];
     handlers.set(identity.commandName, createCommandHandler(identity));
-
-    // Alias para compatibilidad con comandos viejos
-    if (identity.commandName === 'pelaosniper') {
-        handlers.set('pelao', createCommandHandler(identity));
-        console.log('✅ Alias "pelao" registrado');
-    }
 
     console.log(`✅ Comando /${identity.commandName} creado para ${identity.name}`);
     console.log('');
