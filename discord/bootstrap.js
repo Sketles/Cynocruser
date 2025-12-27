@@ -8,9 +8,70 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 // URL de descarga directa de Google Drive
-const CASSETTE_ZIP_URL = 'https://drive.google.com/uc?export=download&id=1dXFbKbAHmzsKAzF4X0ECkygclsFZBBJu';
+const DRIVE_FILE_ID = '1dXFbKbAHmzsKAzF4X0ECkygclsFZBBJu';
 const CASSETTES_DIR = path.join(__dirname, '..', 'core', 'cassettes');
 const CASSETTE_CHECK = path.join(CASSETTES_DIR, 'pelaosniper', 'core-engram.yaml');
+
+/**
+ * Descarga archivo desde Google Drive usando fetch nativo
+ */
+async function downloadFromDrive(fileId, destPath) {
+    // Google Drive direct download URL
+    const url = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
+    console.log('📡 Conectando a Google Drive...');
+
+    const response = await fetch(url, {
+        redirect: 'follow',
+        headers: {
+            'User-Agent': 'Mozilla/5.0'
+        }
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    // Verificar si hay confirmación requerida (archivos grandes)
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('text/html')) {
+        // Google pide confirmación, extraer token y reintentar
+        const html = await response.text();
+        const confirmMatch = html.match(/confirm=([0-9A-Za-z_-]+)/);
+        if (confirmMatch) {
+            const confirmUrl = `https://drive.google.com/uc?export=download&confirm=${confirmMatch[1]}&id=${fileId}`;
+            console.log('📡 Confirmando descarga...');
+            const confirmResponse = await fetch(confirmUrl, { redirect: 'follow' });
+            if (!confirmResponse.ok) {
+                throw new Error(`Confirm failed: ${confirmResponse.status}`);
+            }
+            const buffer = await confirmResponse.arrayBuffer();
+            fs.writeFileSync(destPath, Buffer.from(buffer));
+            return;
+        }
+    }
+
+    const buffer = await response.arrayBuffer();
+    fs.writeFileSync(destPath, Buffer.from(buffer));
+}
+
+/**
+ * Extrae zip usando tar (disponible en Railway) o unzip
+ */
+function extractZip(zipPath, destDir) {
+    try {
+        // Intentar con unzip primero
+        execSync(`unzip -o "${zipPath}" -d "${destDir}"`, { stdio: 'pipe' });
+    } catch {
+        // Fallback: usar Node.js para extraer (requiere instalar alguna lib)
+        // Por ahora, intentar con tar si es compatible
+        try {
+            execSync(`tar -xf "${zipPath}" -C "${destDir}"`, { stdio: 'pipe' });
+        } catch (e) {
+            throw new Error('No se pudo extraer el zip. Ni unzip ni tar disponibles.');
+        }
+    }
+}
 
 /**
  * Descarga y extrae cassettes si no existen
@@ -32,9 +93,9 @@ async function bootstrapCassettes() {
 
         const zipPath = path.join(CASSETTES_DIR, 'cassettes.zip');
 
-        // Descargar usando curl (disponible en Railway)
+        // Descargar usando fetch nativo
         console.log('📡 Descargando cassettes.zip...');
-        execSync(`curl -L "${CASSETTE_ZIP_URL}" -o "${zipPath}"`, { stdio: 'inherit' });
+        await downloadFromDrive(DRIVE_FILE_ID, zipPath);
 
         // Verificar que se descargó
         if (!fs.existsSync(zipPath)) {
@@ -44,15 +105,23 @@ async function bootstrapCassettes() {
         const stats = fs.statSync(zipPath);
         console.log(`📦 Descargado: ${(stats.size / 1024).toFixed(1)} KB`);
 
-        // Extraer usando unzip (disponible en Railway)
+        // Extraer
         console.log('📂 Extrayendo...');
-        execSync(`unzip -o "${zipPath}" -d "${CASSETTES_DIR}"`, { stdio: 'inherit' });
+        extractZip(zipPath, CASSETTES_DIR);
 
         // Limpiar zip
         fs.unlinkSync(zipPath);
 
-        console.log('✅ Cassettes instalados correctamente');
-        return true;
+        // Verificar extracción
+        if (fs.existsSync(CASSETTE_CHECK)) {
+            console.log('✅ Cassettes instalados correctamente');
+            return true;
+        } else {
+            // Puede que el zip tenga estructura diferente, listar contenido
+            const contents = fs.readdirSync(CASSETTES_DIR);
+            console.log('📁 Contenido extraído:', contents);
+            throw new Error('Estructura de cassettes incorrecta');
+        }
 
     } catch (error) {
         console.error('❌ Error descargando cassettes:', error.message);
