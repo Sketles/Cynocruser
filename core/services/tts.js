@@ -44,24 +44,17 @@ async function humeTextToSpeech(text, options = {}) {
         throw new Error('HUME_API_KEY o HUME_VOICE_ID no configurados');
     }
 
-    console.log(`🗣️ [Hume TTS] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+    console.log(`🗣️ [Hume TTS Octave 2] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
 
-    // Octave 2 NO soporta 'description', usar version 1 si necesitas emoción
-    const useOctave1 = options.emotion || config.emotion;
-
+    // Siempre usar Octave 2 (mejor calidad, no soporta description)
     const body = {
         utterances: [{
             text: text,
             voice: { id: voiceId }
         }],
         format: { type: 'mp3' },
-        version: useOctave1 ? '1' : '2'  // Octave 1 para emotion, Octave 2 sin
+        version: '2'
     };
-
-    // Solo agregar description en Octave 1
-    if (useOctave1) {
-        body.utterances[0].description = options.emotion || config.emotion;
-    }
 
     const response = await fetch(HUME_API_URL, {
         method: 'POST',
