@@ -270,15 +270,37 @@ function createCommandHandler(character) {
         // /comando hablame <texto>
         // ═══════════════════════════════════════════════════════════════
         if (subcommand === 'hablame') {
+            await interaction.deferReply();
+
+            // Auto-Join Strategy: Si no estamos conectados, intentar conectar al canal del usuario
             if (!isConnected(guildId)) {
-                const embed = new EmbedBuilder()
-                    .setColor(COLORS.error)
-                    .setDescription(`❌ **Primero usa** \`/${character.commandName} ingresa\``);
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                const voiceChannel = interaction.member.voice?.channel;
+                if (!voiceChannel) {
+                    const embed = new EmbedBuilder()
+                        .setColor(COLORS.error)
+                        .setDescription('❌ **Únete a un canal de voz primero**');
+                    return interaction.editReply({ embeds: [embed] });
+                }
+
+                try {
+                    // Intento de conexión "silenciosa" (o con log mínimo)
+                    const connected = await joinChannel(voiceChannel);
+                    if (!connected) {
+                        const embed = new EmbedBuilder()
+                            .setColor(COLORS.error)
+                            .setDescription('❌ **No pude conectar al canal automáticamente**');
+                        return interaction.editReply({ embeds: [embed] });
+                    }
+                } catch (error) {
+                    console.error('[Auto-Join] Falló:', error);
+                    const embed = new EmbedBuilder()
+                        .setColor(COLORS.error)
+                        .setDescription('❌ **Error de conexión automático**');
+                    return interaction.editReply({ embeds: [embed] });
+                }
             }
 
             const userMessage = interaction.options.getString('texto');
-            await interaction.deferReply();
 
             try {
                 const aiResponse = await generateResponse(character, interaction.user.id, userMessage);
@@ -301,7 +323,12 @@ function createCommandHandler(character) {
                 const embed = new EmbedBuilder()
                     .setColor(COLORS.error)
                     .setDescription(`❌ **Error:** ${error.message}`);
-                return interaction.editReply({ embeds: [embed] });
+                // Usamos followUp o editReply seguro
+                try {
+                    await interaction.editReply({ embeds: [embed] });
+                } catch {
+                    await interaction.followUp({ embeds: [embed], ephemeral: true });
+                }
             }
         }
 
@@ -309,15 +336,34 @@ function createCommandHandler(character) {
         // /comando repite <texto>
         // ═══════════════════════════════════════════════════════════════
         if (subcommand === 'repite') {
+            await interaction.deferReply();
+
+            // Auto-Join Strategy
             if (!isConnected(guildId)) {
-                const embed = new EmbedBuilder()
-                    .setColor(COLORS.error)
-                    .setDescription(`❌ **Primero usa** \`/${character.commandName} ingresa\``);
-                return interaction.reply({ embeds: [embed], ephemeral: true });
+                const voiceChannel = interaction.member.voice?.channel;
+                if (!voiceChannel) {
+                    const embed = new EmbedBuilder()
+                        .setColor(COLORS.error)
+                        .setDescription('❌ **Únete a un canal de voz primero**');
+                    return interaction.editReply({ embeds: [embed] });
+                }
+                try {
+                    const connected = await joinChannel(voiceChannel);
+                    if (!connected) {
+                        const embed = new EmbedBuilder()
+                            .setColor(COLORS.error)
+                            .setDescription('❌ **No pude conectar al canal automáticamente**');
+                        return interaction.editReply({ embeds: [embed] });
+                    }
+                } catch (error) {
+                    const embed = new EmbedBuilder()
+                        .setColor(COLORS.error)
+                        .setDescription('❌ **Error de conexión automático**');
+                    return interaction.editReply({ embeds: [embed] });
+                }
             }
 
             const texto = interaction.options.getString('texto');
-            await interaction.deferReply();
 
             try {
                 const audioBuffer = await textToSpeech(texto);
