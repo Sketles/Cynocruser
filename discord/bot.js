@@ -10,22 +10,17 @@ const { Client, GatewayIntentBits } = require('discord.js');
 const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 
-// ═══════════════════════════════════════════════════════════════════
-// IMPORTAR DESDE /core (MODULAR)
-// ═══════════════════════════════════════════════════════════════════
-const {
-    loadCassette,
-    cassetteSettings
-} = require('../core');
+// ╔════════════════════════════════════════════════════════════════════╗
+// ║                    CYNOCRUSER - DISCORD BOT                        ║
+// ║                                                                    ║
+// ║   Bot de Discord con Ψ-Organ + Voz Clonada                         ║
+// ║   Arquitectura modular: importa solo de /core                      ║
+// ╚════════════════════════════════════════════════════════════════════╝
 
-// ═══════════════════════════════════════════════════════════════════
-// COMPONENTES DISCORD (LOCALES)
-// ═══════════════════════════════════════════════════════════════════
-const {
-    createCommandDefinition,
-    createCommandHandler,
-    checkAutoDisconnect
-} = require('./commands/factory');
+require('dotenv').config();
+const { Client, GatewayIntentBits } = require('discord.js');
+const { REST } = require('@discordjs/rest');
+const { Routes } = require('discord-api-types/v9');
 const { bootstrapCassettes } = require('./bootstrap');
 
 // ═══════════════════════════════════════════════════════════════════
@@ -72,38 +67,6 @@ let commands = [];
 const handlers = new Map();
 
 // ═══════════════════════════════════════════════════════════════════
-// REGISTRAR COMANDOS
-// ═══════════════════════════════════════════════════════════════════
-const rest = new REST({ version: '9' }).setToken(config.token);
-
-async function registerCommands() {
-    try {
-        if (commands.length === 0) {
-            console.warn('⚠️ No hay comandos para registrar');
-            return;
-        }
-
-        if (config.guildIds.length > 0) {
-            for (const guildId of config.guildIds) {
-                await rest.put(
-                    Routes.applicationGuildCommands(config.clientId, guildId),
-                    { body: commands }
-                );
-                console.log(`✅ Comandos registrados en guild: ${guildId}`);
-            }
-        } else {
-            await rest.put(
-                Routes.applicationCommands(config.clientId),
-                { body: commands }
-            );
-            console.log('🌍 Comandos registrados GLOBALMENTE');
-        }
-    } catch (error) {
-        console.error('❌ Error registrando comandos:', error);
-    }
-}
-
-// ═══════════════════════════════════════════════════════════════════
 // INICIALIZACIÓN
 // ═══════════════════════════════════════════════════════════════════
 async function initialize() {
@@ -120,7 +83,13 @@ async function initialize() {
     // 2. Bootstrap: Descargar cassettes si no existen (Railway volume)
     await bootstrapCassettes();
 
-    // 3. Cargar cassette desde /core
+    // 3. Cargar módulos (AHORA QUE LOS CASSETTES EXISTEN)
+    // Esto previene warnings de WeatherService
+    console.log('📦 Cargando módulos...');
+    const { loadCassette, cassetteSettings } = require('../core');
+    const { createCommandDefinition, createCommandHandler, checkAutoDisconnect } = require('./commands/factory');
+
+    // 4. Cargar cassette
     console.log('📼 Cargando cassette...');
     const cassetteId = cassetteSettings.cassette;
     const cassette = loadCassette(cassetteId);
@@ -130,7 +99,7 @@ async function initialize() {
         process.exit(1);
     }
 
-    // 3. Crear identidad desde cassette
+    // 5. Crear identidad desde cassette
     const identity = {
         id: cassetteId,
         cassetteId: cassetteId,
@@ -145,44 +114,65 @@ async function initialize() {
         }
     };
 
-    // 4. Generar comandos
+    // 6. Generar comandos
     commands = [createCommandDefinition(identity)];
     handlers.set(identity.commandName, createCommandHandler(identity));
 
     console.log(`✅ Comando /${identity.commandName} creado para ${identity.name}`);
     console.log('');
 
-    // 5. Conectar a Discord
+    // 7. Configurar eventos (dentro de initialize para acceder a imports)
+
+    // Auto-desconexión
+    client.on('voiceStateUpdate', (oldState, newState) => {
+        if (oldState.channelId) {
+            checkAutoDisconnect(oldState.channelId, newState.guild.id, client);
+        }
+    });
+
+    // Manejo de comandos
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+
+        const handler = handlers.get(interaction.commandName);
+        if (handler) {
+            await handler(interaction);
+        }
+    });
+
+    client.once('ready', async () => {
+        console.log(`🤖 Conectado como ${client.user.tag}`);
+
+        // Registrar comandos
+        const rest = new REST({ version: '9' }).setToken(config.token);
+        try {
+            if (config.guildIds.length > 0) {
+                for (const guildId of config.guildIds) {
+                    await rest.put(
+                        Routes.applicationGuildCommands(config.clientId, guildId),
+                        { body: commands }
+                    );
+                    console.log(`✅ Comandos registrados en guild: ${guildId}`);
+                }
+            } else {
+                await rest.put(
+                    Routes.applicationCommands(config.clientId),
+                    { body: commands }
+                );
+                console.log('🌍 Comandos registrados GLOBALMENTE');
+            }
+        } catch (error) {
+            console.error('❌ Error registrando comandos:', error);
+        }
+
+        console.log('');
+        console.log('✅ Bot listo y funcionando!');
+        console.log('');
+    });
+
+    // 8. Conectar a Discord
     await client.login(config.token);
 }
-
-// ═══════════════════════════════════════════════════════════════════
-// EVENTOS
-// ═══════════════════════════════════════════════════════════════════
-client.once('ready', async () => {
-    console.log(`🤖 Conectado como ${client.user.tag}`);
-    await registerCommands();
-    console.log('');
-    console.log('✅ Bot listo y funcionando!');
-    console.log('');
-});
-
-// Auto-desconexión cuando el canal queda vacío
-client.on('voiceStateUpdate', (oldState, newState) => {
-    if (oldState.channelId) {
-        checkAutoDisconnect(oldState.channelId, newState.guild.id, client);
-    }
-});
-
-// Manejar comandos
-client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
-
-    const handler = handlers.get(interaction.commandName);
-    if (handler) {
-        await handler(interaction);
-    }
-});
 
 // ═══════════════════════════════════════════════════════════════════
 // INICIAR
