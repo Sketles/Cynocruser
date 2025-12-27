@@ -16,8 +16,7 @@ const {
 } = require('@discordjs/voice');
 const { Readable } = require('stream');
 
-// Almacenamiento local de conexiones y players por guild
-const connections = new Map();
+// Almacenamiento de reproductores y colas
 const audioPlayers = new Map();
 const audioQueues = new Map();
 const isPlaying = new Map();
@@ -26,16 +25,23 @@ const isPlaying = new Map();
  * Obtiene o crea un audio player para un guild
  */
 function getOrCreatePlayer(guildId) {
-    if (!audioPlayers.has(guildId)) {
-        const player = createAudioPlayer({
+    let player = audioPlayers.get(guildId);
+
+    if (!player) {
+        player = createAudioPlayer({
             behaviors: {
                 noSubscriber: NoSubscriberBehavior.Play
             }
         });
         audioPlayers.set(guildId, player);
         console.log(`[Voice] Player creado para guild: ${guildId}`);
+
+        player.on('error', error => {
+            console.error(`[Voice] Error en player ${guildId}:`, error.message);
+        });
     }
-    return audioPlayers.get(guildId);
+
+    return player;
 }
 
 /**
@@ -45,20 +51,15 @@ async function joinChannel(voiceChannel) {
     const guildId = voiceChannel.guild.id;
 
     try {
-        let existingConn = connections.get(guildId);
-        const discordConn = getVoiceConnection(guildId);
+        const existingConnection = getVoiceConnection(guildId);
 
-        if (existingConn || discordConn) {
-            const conn = existingConn || discordConn;
-            if (conn.state.status !== VoiceConnectionStatus.Destroyed) {
-                if (conn.joinConfig.channelId === voiceChannel.id) {
-                    console.log(`[Voice] Ya conectado a: ${voiceChannel.name}`);
-                    connections.set(guildId, conn);
-                    return true;
-                }
-                console.log(`[Voice] Cambiando de canal...`);
-                conn.destroy();
+        if (existingConnection) {
+            if (existingConnection.joinConfig.channelId === voiceChannel.id) {
+                console.log(`[Voice] Ya conectado a: ${voiceChannel.name}`);
+                return true;
             }
+            console.log(`[Voice] Cambiando de canal...`);
+            existingConnection.destroy();
         }
 
         console.log(`[Voice] Conectando a: ${voiceChannel.name} (guild: ${guildId})`);
@@ -71,48 +72,41 @@ async function joinChannel(voiceChannel) {
             selfMute: false
         });
 
-        connections.set(guildId, connection);
-
         const player = getOrCreatePlayer(guildId);
         connection.subscribe(player);
 
         // Esperar a que la conexión esté LISTA antes de confirmar
+        // Timeout reducido a 15s para mejor feedback
         try {
-            await entersState(connection, VoiceConnectionStatus.Ready, 20_000);
+            await entersState(connection, VoiceConnectionStatus.Ready, 15_000);
             console.log(`[Voice] ✅ Conexión READY en: ${voiceChannel.name}`);
         } catch (error) {
             console.error('[Voice] Timeout esperando READY:', error);
             connection.destroy();
-            throw error;
+            throw new Error('Timeout al conectar al canal de voz.');
         }
 
-        connection.on(VoiceConnectionStatus.Disconnected, () => {
-            console.log('[Voice] Estado: Disconnected');
-            setTimeout(() => {
-                const conn = connections.get(guildId);
-                if (conn && conn.state.status === VoiceConnectionStatus.Disconnected) {
-                    console.log('[Voice] Limpiando conexión desconectada');
-                    conn.destroy();
-                }
-            }, 5000);
+        // Manejo de desconexiones
+        connection.on(VoiceConnectionStatus.Disconnected, async () => {
+            try {
+                await Promise.race([
+                    entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+                    entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
+                ]);
+                // Se está reconectando
+            } catch (error) {
+                console.log('[Voice] Desconectado permanentemente, limpiando...');
+                connection.destroy();
+                audioPlayers.delete(guildId);
+                audioQueues.delete(guildId);
+                isPlaying.delete(guildId);
+            }
         });
 
-        connection.on(VoiceConnectionStatus.Destroyed, () => {
-            console.log('[Voice] Conexión destruida, limpiando...');
-            connections.delete(guildId);
-            audioPlayers.delete(guildId);
-        });
-
-        connection.on('error', (error) => {
-            console.error('[Voice] Error de conexión:', error.message);
-        });
-
-        console.log(`[Voice] ✅ joinChannel completado para: ${voiceChannel.name}`);
         return true;
 
     } catch (error) {
-        console.error('[Voice] Error al unirse:', error);
-        connections.delete(guildId);
+        console.error('[Voice] Error crítico al unirse:', error.message);
         return false;
     }
 }
@@ -121,15 +115,13 @@ async function joinChannel(voiceChannel) {
  * Desconecta el bot del canal de voz
  */
 function leaveChannel(guildId) {
-    let connection = connections.get(guildId);
-    if (!connection) {
-        connection = getVoiceConnection(guildId);
-    }
+    const connection = getVoiceConnection(guildId);
 
     if (connection) {
         connection.destroy();
-        connections.delete(guildId);
         audioPlayers.delete(guildId);
+        audioQueues.delete(guildId);
+        isPlaying.delete(guildId);
         console.log('[Voice] Desconectado del canal de voz');
         return true;
     }
@@ -138,43 +130,26 @@ function leaveChannel(guildId) {
 }
 
 /**
- * Verifica si el bot está conectado a un canal de voz
+ * Verifica si el bot está conectado y listo para reproducir
  */
 function isConnected(guildId) {
-    let connection = connections.get(guildId);
+    const connection = getVoiceConnection(guildId);
 
-    if (!connection) {
-        connection = getVoiceConnection(guildId);
-        if (connection) {
-            connections.set(guildId, connection);
-        }
-    }
-
-    if (!connection) {
-        return false;
-    }
+    if (!connection) return false;
 
     const state = connection.state.status;
-    const isValid = state === VoiceConnectionStatus.Ready ||
-        state === VoiceConnectionStatus.Connecting ||
-        state === VoiceConnectionStatus.Signalling;
 
-    if (state === VoiceConnectionStatus.Destroyed ||
-        state === VoiceConnectionStatus.Disconnected) {
-        connections.delete(guildId);
-    }
-
-    return isValid;
+    // Consideramos válido si está listo, señalizando o conectando
+    return state === VoiceConnectionStatus.Ready ||
+        state === VoiceConnectionStatus.Signalling ||
+        state === VoiceConnectionStatus.Connecting;
 }
 
 /**
  * Agrega audio a la cola y procesa
  */
 async function playAudio(guildId, audioBuffer) {
-    let connection = connections.get(guildId);
-    if (!connection) {
-        connection = getVoiceConnection(guildId);
-    }
+    const connection = getVoiceConnection(guildId);
 
     if (!connection) {
         throw new Error('No estoy conectado a ningún canal de voz');
@@ -215,32 +190,20 @@ async function processQueue(guildId) {
     isPlaying.set(guildId, true);
     const { buffer, resolve, reject } = queue.shift();
 
-    let connection = connections.get(guildId);
-    if (!connection) {
-        connection = getVoiceConnection(guildId);
-    }
+    const connection = getVoiceConnection(guildId);
 
     if (!connection) {
-        reject(new Error('Conexión perdida'));
+        reject(new Error('Conexión perdida durante reproducción'));
         processQueue(guildId);
         return;
     }
 
+    // Asegurar que estamos listos para reproducir
     if (connection.state.status !== VoiceConnectionStatus.Ready) {
         try {
-            await new Promise((res, rej) => {
-                const timeout = setTimeout(() => rej(new Error('Timeout')), 10000);
-                connection.once(VoiceConnectionStatus.Ready, () => {
-                    clearTimeout(timeout);
-                    res();
-                });
-                if (connection.state.status === VoiceConnectionStatus.Ready) {
-                    clearTimeout(timeout);
-                    res();
-                }
-            });
+            await entersState(connection, VoiceConnectionStatus.Ready, 5_000);
         } catch (error) {
-            reject(error);
+            reject(new Error('Conexión inestable (no Ready)'));
             processQueue(guildId);
             return;
         }
@@ -284,11 +247,15 @@ async function processQueue(guildId) {
         player.once(AudioPlayerStatus.Idle, onIdle);
         player.once('error', onError);
 
+        // Safety timeout de 2 minutos
         setTimeout(() => {
-            cleanup();
-            resolve(true);
-            processQueue(guildId);
-        }, 60000);
+            if (player.state.status !== AudioPlayerStatus.Idle) {
+                console.warn('[Voice] Safety timeout activado');
+                cleanup();
+                resolve(true);
+                processQueue(guildId);
+            }
+        }, 120000);
 
     } catch (error) {
         console.error('[Voice] Error playAudio:', error);
@@ -301,7 +268,7 @@ async function processQueue(guildId) {
  * Obtiene info del canal actual
  */
 function getConnectionInfo(guildId) {
-    const connection = connections.get(guildId) || getVoiceConnection(guildId);
+    const connection = getVoiceConnection(guildId);
     if (!connection) return null;
     return {
         channelId: connection.joinConfig.channelId,
