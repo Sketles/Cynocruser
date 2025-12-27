@@ -75,15 +75,17 @@ async function joinChannel(voiceChannel) {
         const player = getOrCreatePlayer(guildId);
         connection.subscribe(player);
 
-        // Esperar a que la conexión esté LISTA antes de confirmar
-        // Timeout reducido a 15s para mejor feedback
+        // Esperar un poco a que conecte, pero no bloquear indefinidamente ni destruir si tarda
         try {
-            await entersState(connection, VoiceConnectionStatus.Ready, 15_000);
-            console.log(`[Voice] ✅ Conexión READY en: ${voiceChannel.name}`);
+            await Promise.race([
+                entersState(connection, VoiceConnectionStatus.Ready, 5_000),
+                entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
+                entersState(connection, VoiceConnectionStatus.Connecting, 5_000)
+            ]);
+            console.log(`[Voice] ✅ Conexión establecida (Ready/Signalling/Connecting)`);
         } catch (error) {
-            console.error('[Voice] Timeout esperando READY:', error);
-            connection.destroy();
-            throw new Error('Timeout al conectar al canal de voz.');
+            console.warn('[Voice] La conexión tarda un poco, pero continuando en background...', error.message);
+            // NO destruimos la conexión, dejamos que intente seguir conectando
         }
 
         // Manejo de desconexiones
@@ -95,11 +97,14 @@ async function joinChannel(voiceChannel) {
                 ]);
                 // Se está reconectando
             } catch (error) {
-                console.log('[Voice] Desconectado permanentemente, limpiando...');
-                connection.destroy();
-                audioPlayers.delete(guildId);
-                audioQueues.delete(guildId);
-                isPlaying.delete(guildId);
+                // Solo limpiar si realmente pasó mucho tiempo desconectado
+                if (connection.state.status === VoiceConnectionStatus.Disconnected) {
+                    console.log('[Voice] Desconectado permanentemente, limpiando...');
+                    connection.destroy();
+                    audioPlayers.delete(guildId);
+                    audioQueues.delete(guildId);
+                    isPlaying.delete(guildId);
+                }
             }
         });
 
