@@ -45,7 +45,7 @@ module.exports = {
             // Agrega más aquí y en tu .env
         },
 
-        emotion: 'casual',      // Estilo emocional base
+        // emotion: 'casual',   // AHORA ES DINÁMICO desde Ψ-Organ
         speed: 1.1              // Velocidad (0.5 - 2.0)
     },
 

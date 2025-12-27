@@ -31,6 +31,18 @@ const conversationHistory = new Map();
 // Cliente AI compartido
 let aiClient = null;
 
+// Mapeo de emociones Ψ-Organ → descripciones para Hume TTS
+const EMOTION_TO_VOICE = {
+    neutral: 'calm, conversational, relaxed',
+    happy: 'cheerful, enthusiastic, warm',
+    angry: 'frustrated, intense, firm',
+    sad: 'melancholic, subdued, quiet',
+    anxious: 'nervous, hesitant, uncertain',
+    excited: 'energetic, animated, eager',
+    tired: 'drowsy, slow, low energy',
+    defensive: 'guarded, tense, cautious'
+};
+
 /**
  * Obtiene o crea instancia de AIClient
  */
@@ -65,7 +77,8 @@ function getPsiOrgan(guildId, cassetteId) {
 }
 
 /**
- * Genera respuesta de IA
+ * Genera respuesta de IA con estado emocional
+ * @returns {{ text: string, emotion: string }} Respuesta y emoción para TTS
  */
 async function generateResponse(character, userId, userMessage) {
     const cassette = getCassette(character.cassetteId);
@@ -97,7 +110,17 @@ async function generateResponse(character, userId, userMessage) {
     });
 
     history.push({ role: 'assistant', content: response });
-    return response;
+
+    // Mapear emoción del Ψ-Organ a descripción de voz
+    const psiEmotion = psiState?.emotion || 'neutral';
+    const voiceEmotion = EMOTION_TO_VOICE[psiEmotion] || EMOTION_TO_VOICE.neutral;
+
+    console.log(`[Ψ-Organ] Emoción: ${psiEmotion} → Voz: ${voiceEmotion}`);
+
+    return {
+        text: response,
+        emotion: voiceEmotion
+    };
 }
 
 /**
@@ -304,11 +327,11 @@ function createCommandHandler(character) {
 
             try {
                 console.log(`[Hablame] 1. Generando respuesta IA para: "${userMessage}"`);
-                const aiResponse = await generateResponse(character, interaction.user.id, userMessage);
+                const { text: aiResponse, emotion } = await generateResponse(character, interaction.user.id, userMessage);
                 console.log(`[Hablame] 2. Respuesta IA generada: "${aiResponse.substring(0, 50)}..."`);
 
-                console.log(`[Hablame] 3. Generando TTS...`);
-                const audioBuffer = await textToSpeech(aiResponse);
+                console.log(`[Hablame] 3. Generando TTS con emoción: ${emotion}`);
+                const audioBuffer = await textToSpeech(aiResponse, { emotion });
                 console.log(`[Hablame] 4. TTS generado (${audioBuffer.length} bytes). Reproduciendo...`);
 
                 await playAudio(guildId, audioBuffer);
@@ -321,7 +344,7 @@ function createCommandHandler(character) {
                         iconURL: interaction.client.user.displayAvatarURL()
                     })
                     .setDescription(`🔊 *"${aiResponse}"*`)
-                    .setFooter({ text: `Para ${user.displayName}` });
+                    .setFooter({ text: `Para ${user.displayName} • ${emotion.split(',')[0]}` });
 
                 return interaction.editReply({ embeds: [embed] });
 

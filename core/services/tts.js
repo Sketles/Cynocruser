@@ -46,17 +46,20 @@ async function humeTextToSpeech(text, options = {}) {
 
     console.log(`🗣️ [Hume TTS] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
 
+    // Octave 2 NO soporta 'description', usar version 1 si necesitas emoción
+    const useOctave1 = options.emotion || config.emotion;
+
     const body = {
         utterances: [{
             text: text,
             voice: { id: voiceId }
         }],
         format: { type: 'mp3' },
-        version: '2'
+        version: useOctave1 ? '1' : '2'  // Octave 1 para emotion, Octave 2 sin
     };
 
-    // Agregar descripción de emoción si se proporciona
-    if (options.emotion || config.emotion) {
+    // Solo agregar description en Octave 1
+    if (useOctave1) {
         body.utterances[0].description = options.emotion || config.emotion;
     }
 
