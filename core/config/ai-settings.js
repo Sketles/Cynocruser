@@ -40,8 +40,8 @@ module.exports = {
     // ║   Esta es la IA principal que genera las respuestas del personaje     ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
-    provider: 'sambanova',
-    model: 'Meta-Llama-3.3-70B-Instruct',
+    provider: 'gemini',
+    model: 'gemini-2.5-flash-lite',
 
     maxTokens: 500,
     topP: 0.88,

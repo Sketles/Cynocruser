@@ -21,9 +21,15 @@ class AIClient {
         }
 
         this.provider = providersConfig[this.providerId];
-        // Instanciar API Key default si es posible
+
+        // Instanciar API Key default
         try {
-            this.apiKey = this.provider ? this._resolveApiKey(this.provider) : null;
+            // Si hay apiKeyEnv en settings, usarlo en vez del provider default
+            if (aiSettings.apiKeyEnv && process.env[aiSettings.apiKeyEnv]) {
+                this.apiKey = process.env[aiSettings.apiKeyEnv];
+            } else {
+                this.apiKey = this.provider ? this._resolveApiKey(this.provider) : null;
+            }
         } catch (e) {
             this.apiKey = null; // Se resolverá en runtime si es necesario
         }
