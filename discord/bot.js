@@ -107,6 +107,12 @@ async function initialize() {
     commands = [createCommandDefinition(identity)];
     handlers.set(identity.commandName, createCommandHandler(identity));
 
+    // Alias para compatibilidad con comandos viejos
+    if (identity.commandName === 'pelaosniper') {
+        handlers.set('pelao', createCommandHandler(identity));
+        console.log('✅ Alias "pelao" registrado');
+    }
+
     console.log(`✅ Comando /${identity.commandName} creado para ${identity.name}`);
     console.log('');
 
@@ -131,15 +137,16 @@ async function initialize() {
                 await handler(interaction);
             } catch (error) {
                 console.error('❌ Error ejecutando handler:', error);
+                const replyOptions = { content: '❌ Error interno al ejecutar el comando.', flags: 64 }; // 64 = Ephemeral
                 if (!interaction.replied && !interaction.deferred) {
-                    await interaction.reply({ content: '❌ Error interno al ejecutar el comando.', ephemeral: true });
+                    await interaction.reply(replyOptions);
                 } else {
-                    await interaction.followUp({ content: '❌ Error interno al ejecutar el comando.', ephemeral: true });
+                    await interaction.followUp(replyOptions);
                 }
             }
         } else {
             console.warn(`⚠️ No handler found for ${interaction.commandName}`);
-            await interaction.reply({ content: '❌ Comando no reconocido internamente.', ephemeral: true });
+            await interaction.reply({ content: '❌ Comando no reconocido internamente.', flags: 64 });
         }
     });
 
