@@ -26,6 +26,7 @@ const {
     createCommandHandler,
     checkAutoDisconnect
 } = require('./commands/factory');
+const { bootstrapCassettes } = require('./bootstrap');
 
 // ═══════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN
@@ -116,7 +117,10 @@ async function initialize() {
     // 1. Validar configuración
     validateConfig();
 
-    // 2. Cargar cassette desde /core
+    // 2. Bootstrap: Descargar cassettes si no existen (Railway volume)
+    await bootstrapCassettes();
+
+    // 3. Cargar cassette desde /core
     console.log('📼 Cargando cassette...');
     const cassetteId = cassetteSettings.cassette;
     const cassette = loadCassette(cassetteId);
