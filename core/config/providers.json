@@ -149,26 +149,6 @@
                     "tpd": 300000
                 }
             },
-            "openai/gpt-oss-120b": {
-                "context": 32768,
-                "cost": "Free",
-                "limits": {
-                    "rpm": 30,
-                    "rpd": 1000,
-                    "tpm": 8000,
-                    "tpd": 200000
-                }
-            },
-            "openai/gpt-oss-20b": {
-                "context": 32768,
-                "cost": "Free",
-                "limits": {
-                    "rpm": 30,
-                    "rpd": 1000,
-                    "tpm": 8000,
-                    "tpd": 200000
-                }
-            },
             "openai/gpt-oss-safeguard-20b": {
                 "context": 32768,
                 "cost": "$",
@@ -384,23 +364,113 @@
                     "tpm": 250000
                 }
             },
-            "gemini-2.5-flash": {
-                "context": 1000000,
-                "cost": "Free (Very Limited)",
-                "limits": {
-                    "rpm": 2,
-                    "rpd": 20,
-                    "tpm": 250000
-                }
-            },
             "gemini-2.5-flash-lite": {
                 "context": 1000000,
                 "cost": "Free",
                 "limits": {
-                    "rpm": 30,
-                    "rpd": 1500,
+                    "rpm": 10,
+                    "rpd": 20,
                     "tpm": 250000
                 }
+            },
+            "gemini-2.5-flash-tts": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Multimodal (Text-to-Speech)",
+                "limits": {
+                    "rpm": 3,
+                    "rpd": 10,
+                    "tpm": 10000
+                }
+            },
+            "gemini-2.5-flash": {
+                "context": 1000000,
+                "cost": "Free (Very Limited)",
+                "limits": {
+                    "rpm": 5,
+                    "rpd": 20,
+                    "tpm": 250000
+                }
+            },
+            "gemini-3-flash": {
+                "context": 1000000,
+                "cost": "Free",
+                "limits": {
+                    "rpm": 5,
+                    "rpd": 20,
+                    "tpm": 250000
+                }
+            },
+            "gemini-robotics-er-1.5-preview": {
+                "context": 1000000,
+                "cost": "Free (Preview)",
+                "category": "Robotics",
+                "limits": {
+                    "rpm": 10,
+                    "rpd": 20,
+                    "tpm": 250000
+                }
+            },
+            "gemma-3-12b": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Open Model",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000
+                }
+            },
+            "gemma-3-1b": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Open Model",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000
+                }
+            },
+            "gemma-3-27b": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Open Model",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000
+                }
+            },
+            "gemma-3-2b": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Open Model",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000
+                }
+            },
+            "gemma-3-4b": {
+                "context": 1000000,
+                "cost": "Free",
+                "category": "Open Model",
+                "limits": {
+                    "rpm": 30,
+                    "rpd": 14400,
+                    "tpm": 15000
+                }
+            },
+            "gemini-2.5-flash-native-audio-dialog": {
+                "context": 1000000,
+                "cost": "Free (Beta)",
+                "category": "Live Audio API",
+                "limits": {
+                    "rpm": -1,
+                    "rpd": -1,
+                    "tpm": 1000000
+                },
+                "note": "Unlimited RPM and RPD"
             },
             "gemini-2.0-flash": {
                 "context": 1000000,
