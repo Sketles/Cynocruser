@@ -32,6 +32,21 @@ module.exports = {
 
     hume: {
         // ┌─────────────────────────────────────────────────────────────────┐
+        // │ VERSIÓN DE HUME TTS - Octave 1 vs Octave 2                     │
+        // ├─────────────────────────────────────────────────────────────────┤
+        // │ '1' = Octave 1 (Original)                                       │
+        // │   - Soporta 'description' para estilo emocional                 │
+        // │   - Puede sonar más artificial en algunos casos                 │
+        // │   - Mejor para control fino de emoción                          │
+        // │                                                                 │
+        // │ '2' = Octave 2 (Recomendado)                                    │
+        // │   - NO soporta 'description', solo voice ID                     │
+        // │   - Voz más natural y fluida                                    │
+        // │   - Mejor calidad de audio                                      │
+        // └─────────────────────────────────────────────────────────────────┘
+        version: '1',  // '1' o '2' - Cambiar para probar diferencias
+
+        // ┌─────────────────────────────────────────────────────────────────┐
         // │ VOZ ACTIVA - Cambia el nombre para usar otra voz                │
         // └─────────────────────────────────────────────────────────────────┘
         activeVoice: 'pelao',

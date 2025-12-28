@@ -44,7 +44,8 @@ async function humeTextToSpeech(text, options = {}) {
         throw new Error('HUME_API_KEY o HUME_VOICE_ID no configurados');
     }
 
-    console.log(`🗣️ [Hume TTS Octave 2] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+    const version = config.version || '2';  // Default Octave 2
+    console.log(`🗣️ [Hume TTS Octave ${version}] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
 
     // Limpiar texto: eliminar saltos de línea que cortan el audio
     const cleanText = text
@@ -52,15 +53,20 @@ async function humeTextToSpeech(text, options = {}) {
         .replace(/\s+/g, ' ')   // Normalizar espacios
         .trim();
 
-    // Siempre usar Octave 2 (mejor calidad, no soporta description)
+    // Construir payload según versión
     const body = {
         utterances: [{
             text: cleanText,
             voice: { id: voiceId }
         }],
         format: { type: 'mp3' },
-        version: '2'
+        version: version
     };
+
+    // Octave 1 soporta description emocional, Octave 2 no
+    if (version === '1' && options.emotion) {
+        body.utterances[0].description = options.emotion;
+    }
 
     const response = await fetch(HUME_API_URL, {
         method: 'POST',
