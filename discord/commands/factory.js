@@ -263,10 +263,16 @@ function createCommandHandler(character) {
                     const entranceMessages = cassette?.lexicon?.greetings?.entrance_voice_channel || ['Wena cabros'];
                     const randomMessage = entranceMessages[Math.floor(Math.random() * entranceMessages.length)];
 
+                    // Esperar 500ms para que la conexión de voz se estabilice
+                    await new Promise(resolve => setTimeout(resolve, 500));
+
                     try {
+                        console.log(`[Entrance] Generando TTS: "${randomMessage}"`);
                         // Sin parámetros de emoción - voz neutral
                         const audioBuffer = await textToSpeech(randomMessage);
+                        console.log(`[Entrance] Audio generado: ${audioBuffer.length} bytes. Reproduciendo...`);
                         await playAudio(voiceChannel.guild.id, audioBuffer);
+                        console.log(`[Entrance] Audio enviado a cola`);
                     } catch (err) {
                         console.error('[Entrance] Error TTS:', err.message);
                     }
