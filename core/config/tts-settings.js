@@ -44,7 +44,7 @@ module.exports = {
         // │   - Voz más natural y fluida                                    │
         // │   - Mejor calidad de audio                                      │
         // └─────────────────────────────────────────────────────────────────┘
-        version: '1',  // '1' o '2' - Cambiar para probar diferencias
+        version: '2',  // '1' o '2' - Cambiar para probar diferencias
 
         // ┌─────────────────────────────────────────────────────────────────┐
         // │ VOZ ACTIVA - Cambia el nombre para usar otra voz                │
