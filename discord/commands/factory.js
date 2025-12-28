@@ -264,7 +264,8 @@ function createCommandHandler(character) {
                     const randomMessage = entranceMessages[Math.floor(Math.random() * entranceMessages.length)];
 
                     try {
-                        const audioBuffer = await textToSpeech(randomMessage);
+                        // Usar emoción neutral/cheerful para saludo
+                        const audioBuffer = await textToSpeech(randomMessage, { emotion: 'cheerful, friendly, casual' });
                         await playAudio(voiceChannel.guild.id, audioBuffer);
                     } catch (err) {
                         console.error('[Entrance] Error TTS:', err.message);

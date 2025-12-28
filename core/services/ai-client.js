@@ -196,12 +196,21 @@ class AIClient {
             generationConfig: {
                 temperature: settings.temperature ?? 0.9,
                 topP: settings.topP ?? 0.95,
-                maxOutputTokens: settings.maxOutputTokens ?? 1024
+                maxOutputTokens: settings.maxOutputTokens ?? 1024,
+                stopSequences: [
+                    '\ny me dice\n',  // Detectar bucles
+                    '\n\ny me dice',
+                    'y me dice\ny me dice\ny me dice'
+                ],
+                candidateCount: 1
             }
         };
 
+        // Agregar system prompt si existe
         if (systemPrompt) {
-            payload.systemInstruction = { parts: [{ text: systemPrompt }] };
+            payload.systemInstruction = {
+                parts: [{ text: systemPrompt }]
+            };
         }
 
         const response = await fetch(url, {

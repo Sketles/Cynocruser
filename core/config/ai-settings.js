@@ -41,11 +41,15 @@ module.exports = {
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     provider: 'gemini',
-    model: 'gemini-2.5-flash-lite',
+    model: 'gemini-2.5-flash',
+
+    // Parámetros anti-repetición
+    frequencyPenalty: 0.3,  // Penaliza repetir tokens
+    presencePenalty: 0.2,   // Penaliza repetir temas
 
     maxTokens: 500,
     topP: 0.88,
-    temperature: 0.88,
+    temperature: 0.8,
     memorySize: 20,
     useEmojis: false,
 
