@@ -166,6 +166,17 @@ function createCommandDefinition(character) {
                 }]
             },
             {
+                name: 'mensaje',
+                description: `${character.name} te responde con un archivo de voz`,
+                type: 1,
+                options: [{
+                    name: 'texto',
+                    description: `Tu mensaje para ${character.name}`,
+                    type: 3,
+                    required: true
+                }]
+            },
+            {
                 name: 'info',
                 description: `Ver información técnica de ${character.name}`,
                 type: 1
@@ -396,6 +407,53 @@ function createCommandHandler(character) {
                 } catch {
                     await interaction.followUp({ embeds: [embed], ephemeral: true });
                 }
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // /comando mensaje <texto>
+        // ═══════════════════════════════════════════════════════════════
+        if (subcommand === 'mensaje') {
+            await interaction.deferReply();
+
+            const userMessage = interaction.options.getString('texto');
+
+            try {
+                console.log(`[Mensaje] 1. Generando respuesta IA para: "${userMessage}"`);
+                const { text: aiResponse, emotion } = await generateResponse(character, interaction.user.id, userMessage);
+                console.log(`[Mensaje] 2. Respuesta IA generada: "${aiResponse.substring(0, 50)}..."`);
+
+                console.log(`[Mensaje] 3. Generando TTS con emoción: ${emotion}`);
+                const audioBuffer = await textToSpeech(aiResponse, { emotion });
+                console.log(`[Mensaje] 4. TTS generado (${audioBuffer.length} bytes). Enviando archivo...`);
+
+                // Crear archivo adjunto de Discord
+                const { AttachmentBuilder } = require('discord.js');
+                const attachment = new AttachmentBuilder(audioBuffer, {
+                    name: `${character.name.toLowerCase()}_respuesta.mp3`,
+                    description: `Respuesta de ${character.name}`
+                });
+
+                const embed = new EmbedBuilder()
+                    .setColor(COLORS.voice)
+                    .setAuthor({
+                        name: character.name,
+                        iconURL: interaction.client.user.displayAvatarURL()
+                    })
+                    .setDescription(`💬 *"${aiResponse}"*`)
+                    .setFooter({ text: `Para ${user.displayName} • ${emotion.split(',')[0]}` });
+
+                return interaction.editReply({
+                    embeds: [embed],
+                    files: [attachment]
+                });
+
+            } catch (error) {
+                console.error(`[${character.name}] Error mensaje:`, error);
+                const embed = new EmbedBuilder()
+                    .setColor(COLORS.error)
+                    .setDescription(`❌ **Error:** ${error.message}`);
+                return interaction.editReply({ embeds: [embed] });
             }
         }
 
