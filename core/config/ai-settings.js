@@ -41,13 +41,13 @@ module.exports = {
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     provider: 'gemini',
-    model: 'gemini-2.5-flash',
+    model: 'gemini-3-flash',
 
     // Parámetros anti-repetición
     frequencyPenalty: 0.3,  // Penaliza repetir tokens
     presencePenalty: 0.2,   // Penaliza repetir temas
 
-    maxTokens: 500,
+    maxTokens: 666,
     topP: 0.88,
     temperature: 0.88,
     memorySize: 20,
@@ -64,8 +64,8 @@ module.exports = {
         enabled: true, //true or false to enable or disable umwelt-ia (narrative)
         provider: 'groq',
         model: 'groq/compound',
-        maxTokens: 500,
-        temperature: 0.7,
+        maxTokens: 2000,
+        temperature: 0.8,
         topP: 0.9
     }
 };
