@@ -41,7 +41,7 @@ module.exports = {
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     provider: 'gemini',
-    model: 'gemini-3-flash',
+    model: 'gemini-3-flash-preview',
 
     // Parámetros anti-repetición
     frequencyPenalty: 0.3,  // Penaliza repetir tokens
