@@ -177,6 +177,17 @@ function createCommandDefinition(character) {
                 }]
             },
             {
+                name: 'audiorepite',
+                description: `${character.name} repite exactamente lo que escribas (como archivo MP3)`,
+                type: 1,
+                options: [{
+                    name: 'texto',
+                    description: 'Texto que quieres que repita en MP3',
+                    type: 3,
+                    required: true
+                }]
+            },
+            {
                 name: 'info',
                 description: `Ver información técnica de ${character.name}`,
                 type: 1
@@ -507,6 +518,49 @@ function createCommandHandler(character) {
 
             } catch (error) {
                 console.error(`[${character.name}] Error repite:`, error);
+                const embed = new EmbedBuilder()
+                    .setColor(COLORS.error)
+                    .setDescription(`❌ **Error:** ${error.message}`);
+                return interaction.editReply({ embeds: [embed] });
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // /comando audiorepite <texto>
+        // ═══════════════════════════════════════════════════════════════
+        if (subcommand === 'audiorepite') {
+            await interaction.deferReply();
+
+            const texto = interaction.options.getString('texto');
+
+            try {
+                console.log(`[AudioRepite] Generando TTS para: "${texto}"`);
+                const audioBuffer = await textToSpeech(texto);
+                console.log(`[AudioRepite] TTS generado (${audioBuffer.length} bytes). Enviando archivo...`);
+
+                // Crear archivo adjunto de Discord
+                const { AttachmentBuilder } = require('discord.js');
+                const attachment = new AttachmentBuilder(audioBuffer, {
+                    name: `${character.name.toLowerCase()}_repite.mp3`,
+                    description: `${character.name} repitiendo texto`
+                });
+
+                const embed = new EmbedBuilder()
+                    .setColor(COLORS.voice)
+                    .setAuthor({
+                        name: character.name,
+                        iconURL: interaction.client.user.displayAvatarURL()
+                    })
+                    .setDescription(`🔊 *"${texto}"*`)
+                    .setFooter({ text: `Repetido para ${user.displayName}` });
+
+                return interaction.editReply({
+                    embeds: [embed],
+                    files: [attachment]
+                });
+
+            } catch (error) {
+                console.error(`[${character.name}] Error audiorepite:`, error);
                 const embed = new EmbedBuilder()
                     .setColor(COLORS.error)
                     .setDescription(`❌ **Error:** ${error.message}`);
