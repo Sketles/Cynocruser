@@ -5,7 +5,8 @@
   "main": "execute.js",
   "scripts": {
     "start": "node execute.js",
-    "bot": "node discord/bot.js",
+    "bot": "node scripts/bootstrap-cassettes.js && node discord/bot.js",
+    "bot:local": "node discord/bot.js",
     "dev": "node --watch execute.js",
     "dev:bot": "node --watch discord/bot.js",
     "debug": "set DEBUG=true && node --watch execute.js",
