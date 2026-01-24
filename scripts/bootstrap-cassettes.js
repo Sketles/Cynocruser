@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Bootstrap Cassettes - Descarga desde Google Drive usando Node.js puro
+// Bootstrap Cassettes - 100% Node.js, sin dependencias del sistema
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
-const { execSync } = require('child_process');
+const AdmZip = require('adm-zip');
 
 const DRIVE_FILE_ID = process.env.CASSETTE_DRIVE_ID || '1dXFbKbAHmzsKAzF4X0ECkygclsFZBBJu';
 const CASSETTES_DIR = path.join(__dirname, '../core/cassettes');
@@ -16,23 +16,17 @@ function downloadFile(url, dest) {
 
         const request = (url) => {
             https.get(url, (response) => {
-                // Seguir redirects
                 if (response.statusCode === 301 || response.statusCode === 302) {
                     request(response.headers.location);
                     return;
                 }
-
                 response.pipe(file);
-                file.on('finish', () => {
-                    file.close();
-                    resolve();
-                });
+                file.on('finish', () => { file.close(); resolve(); });
             }).on('error', (err) => {
                 fs.unlink(dest, () => { });
                 reject(err);
             });
         };
-
         request(url);
     });
 }
@@ -44,7 +38,6 @@ async function main() {
 
     const pelaoPath = path.join(CASSETTES_DIR, 'pelaosniper');
 
-    // Si ya existen, saltar
     if (fs.existsSync(pelaoPath) && fs.readdirSync(pelaoPath).length > 0) {
         console.log('✅ Cassettes ya existen, saltando descarga.\n');
         return;
@@ -59,22 +52,20 @@ async function main() {
         console.log('📥 Descargando cassettes desde Drive...');
         console.log(`   ID: ${DRIVE_FILE_ID}`);
 
-        // URL de descarga directa con confirmación
         const url = `https://drive.usercontent.google.com/download?id=${DRIVE_FILE_ID}&confirm=t`;
-
         await downloadFile(url, ZIP_PATH);
         console.log('✅ Descarga completada');
 
-        // Extraer ZIP
         console.log('📦 Extrayendo cassettes...');
         if (!fs.existsSync(CASSETTES_DIR)) {
             fs.mkdirSync(CASSETTES_DIR, { recursive: true });
         }
 
-        execSync(`unzip -o "${ZIP_PATH}" -d "${CASSETTES_DIR}"`, { stdio: 'inherit' });
+        // Usar adm-zip (dependencia existente)
+        const zip = new AdmZip(ZIP_PATH);
+        zip.extractAllTo(CASSETTES_DIR, true);
         console.log(`✅ Cassettes extraídos en: ${CASSETTES_DIR}`);
 
-        // Limpiar
         if (fs.existsSync(ZIP_PATH)) fs.unlinkSync(ZIP_PATH);
 
         console.log('\n✅ Bootstrap completado!\n');
