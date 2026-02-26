@@ -22,8 +22,7 @@ Thumbs.db
 # ║                  DATOS PERSONALES SENSIBLES                    ║
 # ╚════════════════════════════════════════════════════════════════╝
 
-# Cassettes contienen información personal (identidad, lenguaje, configuración psicológica)
-core/cassettes/
+# Cassettes incluidos en esta rama para deploy directo
 
 # Logs de prompts pueden contener datos sensibles
 scripts/promptconsole/
