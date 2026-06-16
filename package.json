@@ -4,7 +4,7 @@
   "description": "Ψ-Organ - AI Character Engine with Discord Bot",
   "main": "execute.js",
   "scripts": {
-    "start": "node execute.js",
+    "start": "node discord/bot.js",
     "bot": "node discord/bot.js",
     "bot:local": "node discord/bot.js",
     "dev": "node --watch execute.js",
