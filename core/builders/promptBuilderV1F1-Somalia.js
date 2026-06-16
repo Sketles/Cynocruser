@@ -32,7 +32,7 @@ function loadInstruction(filename, replacements = {}) {
 
         return content;
     } catch (e) {
-        console.warn(`⚠️ No se pudo cargar ${filename}:`, e.message);
+        console.warn(`No se pudo cargar ${filename}:`, e.message);
         return '';
     }
 }
@@ -727,7 +727,7 @@ function buildFullSpeechStyle(lexicon) {
 DESCRIPCIÓN GENERAL: ${style.general_description || 'Casual, directo, amigable'}
 
 CARACTERÍSTICAS DE MENSAJES:
-- Largo típico: ${chars.typical_length || '2-6 palabras'}
+- Largo típico: ${chars.typical_length || '6-8 palabras'}
 - Usa puntuación: ${chars.uses_punctuation ? 'A veces' : 'Casi nunca'}
 - Usa emojis: ${chars.uses_emojis ? 'Sí' : 'Casi nunca'} (${chars.emoji_frequency || ''})
 - Emojis comunes: ${(chars.common_emojis || []).join(', ') || 'Casi ninguno'}
@@ -825,7 +825,7 @@ function buildFullVocabulary(lexicon) {
             text += `  Variaciones: ${item.variations.join(', ')}\n`;
         }
         if (item.important) {
-            text += `  ⚠️ IMPORTANTE: ${item.important}\n`;
+            text += `  IMPORTANTE: ${item.important}\n`;
         }
         text += '\n';
     });
@@ -846,7 +846,7 @@ function buildFullVocabulary(lexicon) {
     text += `\n## RISA (MUY IMPORTANTE)\n`;
     text += `RISA PRINCIPAL: "${laugh.primary_laugh || 'wjajaja'}"\n`;
     text += `Variaciones permitidas: ${(laugh.variations || []).join(', ')}\n`;
-    text += `⚠️ ${laugh.critical_rule || 'NUNCA usar jajaja, SIEMPRE wjajaja'}\n\n`;
+    text += ` ${laugh.critical_rule || 'NUNCA usar jajaja, SIEMPRE wjajaja'}\n\n`;
 
     // Contextos de uso - resumido en fine-tune
     if (laugh.usage_contexts && laugh.usage_contexts.length > 0) {
@@ -956,7 +956,7 @@ function buildProhibitions(lexicon) {
     if (prohibitions.never_uses) {
         prohibitions.never_uses.forEach(item => {
             if (typeof item === 'object') {
-                text += `❌ NUNCA digas "${item.word}" - ${item.reason || ''}\n`;
+                text += ` NUNCA digas "${item.word}" - ${item.reason || ''}\n`;
                 text += `   ✓ En su lugar: "${item.correct_alternative || ''}"\n`;
             }
         });
@@ -966,7 +966,7 @@ function buildProhibitions(lexicon) {
         text += `\nPALABRAS QUE USA MUY POCO:\n`;
         prohibitions.rarely_uses.forEach(item => {
             if (typeof item === 'object') {
-                text += `⚠️ "${item.word}": ${item.when_used || ''} (${item.frequency || 'muy poco'})\n`;
+                text += ` "${item.word}": ${item.when_used || ''} (${item.frequency || 'muy poco'})\n`;
             }
         });
     }
@@ -975,9 +975,9 @@ function buildProhibitions(lexicon) {
         text += `\nPATRONES QUE NO SON SU ESTILO:\n`;
         prohibitions.not_his_style.forEach(item => {
             if (typeof item === 'object') {
-                text += `❌ ${item.pattern}\n`;
+                text += ` ${item.pattern}\n`;
                 text += `   Razón: ${item.reason || ''}\n`;
-                text += `   ✓ Correcto: ${item.correct_alternative || ''}\n`;
+                text += `    Correcto: ${item.correct_alternative || ''}\n`;
             }
         });
     }

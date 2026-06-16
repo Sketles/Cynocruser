@@ -16,6 +16,7 @@ const { Soma } = require('./L1_hypothalamus/soma');
 const { Perception } = require('./L2_thalamus/perception');
 const { Ego } = require('./L3_cortex/ego');
 const { Memory } = require('./hippocampus/memory');
+const { SimaPromptBuilder } = require('../builders/simaPromptBuilder');
 const { Umwelt } = require('./umwelt/worldSimulator');
 
 /**
@@ -59,6 +60,12 @@ class PsiOrgan {
         // ════════════════════════════════════════════════════════════════
         this.characterConfig = config.character || {};
         this.baseSystemPrompt = config.basePrompt || '';
+        // Guardar configuración
+        this.config = config;
+        this.basePrompt = config.basePrompt || null;
+        this.worldConfig = config.worldConfig || null;
+        this.cassette = config.cassette || null; // Para SiMA builder
+        this.useSimaBuilder = config.useSimaBuilder || false;
 
         // Cargar marcadores somáticos iniciales
         if (config.markers) {
@@ -245,6 +252,36 @@ class PsiOrgan {
 
         return parts.join('\n');
     }
+
+    /**
+     * Construye el prompt usando el SiMA Prompt Builder
+     * @returns {string} System Prompt completo en formato SiMA
+     */
+    async buildSimaPrompt() {
+        // Obtener estado completo del Ψ-Organ
+        const psiState = {
+            soma: this.soma.getState(),
+            memoria: {
+                recentMarkers: this.memory.getRecentMarkers ? this.memory.getRecentMarkers(10) : {}
+            },
+            ego: {
+                lastDecision: this.ego.decisionHistory?.[this.ego.decisionHistory.length - 1] || null,
+                defensasActivas: [],
+                modulatorState: this.ego.modulators ? this.ego.modulators.getState() : {}
+            }
+        };
+
+        // Obtener estado del Umwelt
+        const umweltState = await this.umwelt.getWorldContext().catch(() => null);
+
+        // Construir el prompt usando el builder
+        return SimaPromptBuilder.buildSystemPrompt(
+            this.cassette,
+            psiState,
+            umweltState
+        );
+    }
+
 
     /**
      * Carga marcadores somáticos iniciales

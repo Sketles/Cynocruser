@@ -41,7 +41,7 @@ module.exports = {
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     provider: 'gemini',
-    model: 'gemini-3-flash-preview',
+    model: 'gemini-2.5-flash',
 
     // Parámetros anti-repetición
     frequencyPenalty: 0.3,  // Penaliza repetir tokens
@@ -63,7 +63,7 @@ module.exports = {
     umwelt: {
         enabled: true, //true or false to enable or disable umwelt-ia (narrative)
         provider: 'groq',
-        model: 'groq/compound',
+        model: 'llama-3.3-70b-versatile',
         maxTokens: 2000,
         temperature: 0.8,
         topP: 0.9
