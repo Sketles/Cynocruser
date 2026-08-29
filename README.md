@@ -1,8 +1,27 @@
+<div align="center">
+
+<img src="logo.jpg" alt="Cynocruser Logo" width="160" />
+
 # Cynocruser Ψ
 
 **Motor de Personajes Cognitivos basado en el Modelo Psi-Organ (Marco SiMA)**
 
-Sistema de inteligencia artificial orientado a la investigación que implementa un modelo computacional de la psique humana. Cynocruser simula estados mentales dinámicos, pulsiones homeostáticas y mecanismos de defensa psíquica para generar agentes conversacionales adaptativos al contexto, desplegados como bot de Discord con capacidad de voz en tiempo real.
+*Sistema de inteligencia artificial orientado a la investigación que implementa un modelo computacional de la psique humana.*
+
+---
+
+<!-- Stack badges -->
+![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?style=flat-square&logo=node.js&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES2022-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Discord.js](https://img.shields.io/badge/Discord.js-v14-5865F2?style=flat-square&logo=discord&logoColor=white)
+![Gemini](https://img.shields.io/badge/Google_Gemini-2.5_Flash-4285F4?style=flat-square&logo=google&logoColor=white)
+![Groq](https://img.shields.io/badge/Groq-LLaMA_3.3-FF6B35?style=flat-square)
+![Hume AI](https://img.shields.io/badge/Hume_AI-Octave_2-8B5CF6?style=flat-square)
+![YAML](https://img.shields.io/badge/Config-YAML-CB171E?style=flat-square&logo=yaml&logoColor=white)
+![Railway](https://img.shields.io/badge/Deploy-Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+</div>
 
 ---
 
@@ -239,15 +258,24 @@ El sistema está diseñado para despliegue en contenedores sobre [Railway](https
 
 ## Stack tecnológico
 
-| Capa | Tecnología |
-|------|------------|
-| Runtime | Node.js 18+ |
-| Inferencia LLM | Google Gemini API, Groq, SambaNova, OpenRouter |
-| Síntesis de voz | Hume AI Octave 2, ElevenLabs |
-| Integración Discord | discord.js v14, @discordjs/voice |
-| Configuración de personajes | YAML |
-| Entorno | dotenv |
-| Interfaz CLI | chalk, boxen, ora, figlet |
+<div align="center">
+
+| Categoría | Tecnología | Función |
+|-----------|-----------|--------|
+| **Runtime** | Node.js 18+ | Motor de ejecución |
+| **IA Principal** | Google Gemini 2.5 Flash | Inferencia de respuestas del personaje |
+| **IA Principal** | Groq — LLaMA 3.3 70B | Inferencia alternativa de alta velocidad |
+| **IA Principal** | SambaNova — DeepSeek V3 | Inferencia de alto rendimiento |
+| **IA Narrativa** | Cualquier proveedor OpenAI-compatible | Pipeline Umwelt (contexto del mundo) |
+| **Voz** | Hume AI Octave 2 | Síntesis con voz clonada |
+| **Voz** | ElevenLabs | Síntesis alternativa |
+| **Discord** | discord.js v14 | Gateway y comandos slash |
+| **Discord** | @discordjs/voice | Streaming de audio en canales de voz |
+| **Config** | YAML | Definición de cassettes de personaje |
+| **Deploy** | Railway | Plataforma de producción |
+| **CLI** | chalk · boxen · ora · figlet | Interfaz de desarrollo local |
+
+</div>
 
 ---
 
