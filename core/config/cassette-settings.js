@@ -19,17 +19,13 @@ module.exports = {
     // ╠═══════════════════════════════════════════════════════════════════════╣
     // ║   Nombre de la carpeta en core/cassettes/                             ║
     // ║                                                                       ║
-    // ║   Cassettes disponibles:                                              ║
-    // ║   ┌─────────────────┬────────────────────────────────────────────┐    ║
-    // ║   │ 'pelaosniper'   │ Pelao - Gamer chileno, weон simpatico      │    ║
-    // ║   └─────────────────┴────────────────────────────────────────────┘    ║
-    // ║   ┌─────────────────┬────────────────────────────────────────────┐    ║
-    // ║   │ 'another'       │ Otro personaje                             │    ║
-    // ║   └─────────────────┴────────────────────────────────────────────┘    ║
+    // ║   Se puede configurar mediante la variable de entorno CASSETTE_ID     ║
+    // ║   o definiendo el nombre directamente aquí.                           ║
     // ║                                                                       ║
+    // ║   Ejemplo: 'mi-personaje'                                             ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
-    cassette: 'pelaosniper',
+    cassette: process.env.CASSETTE_ID || 'mi-personaje',
 
     // ╔═══════════════════════════════════════════════════════════════════════╗
     // ║    PSI-ORGAN CONFIG                                                   ║

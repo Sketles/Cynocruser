@@ -18,9 +18,12 @@ let _umweltConfig = null;
 function loadUmweltConfig() {
     if (_umweltConfig) return _umweltConfig;
 
+    const cassetteSettings = require('../config/cassette-settings');
+    const cassetteId = cassetteSettings.cassette;
+
     const possiblePaths = [
-        path.join(__dirname, '../cassettes/pelaosniper/core-umwelt.yaml'),
-        path.join(__dirname, '../../cassettes/pelaosniper/core-umwelt.yaml')
+        path.join(__dirname, `../cassettes/${cassetteId}/core-umwelt.yaml`),
+        path.join(__dirname, `../../cassettes/${cassetteId}/core-umwelt.yaml`)
     ];
 
     for (const configPath of possiblePaths) {

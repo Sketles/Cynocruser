@@ -36,9 +36,10 @@ async function main() {
     console.log('  🎵 BOOTSTRAP CASSETTES');
     console.log('═══════════════════════════════════════════════════════════\n');
 
-    const pelaoPath = path.join(CASSETTES_DIR, 'pelaosniper');
+    const cassetteSettings = require('../core/config/cassette-settings');
+    const activeCassettePath = path.join(CASSETTES_DIR, cassetteSettings.cassette);
 
-    if (fs.existsSync(pelaoPath) && fs.readdirSync(pelaoPath).length > 0) {
+    if (fs.existsSync(activeCassettePath) && fs.readdirSync(activeCassettePath).length > 0) {
         console.log('✅ Cassettes ya existen, saltando descarga.\n');
         return;
     }

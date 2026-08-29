@@ -138,7 +138,13 @@ core/cassettes/<id_personaje>/
 └── core-umwelt.yaml        # Configuración del mundo: ubicación, horario, contexto social
 ```
 
-La arquitectura de cassettes permite iterar personajes rápidamente sin modificar el motor cognitivo. Se pueden definir múltiples personajes y activar cualquiera cambiando un único valor de configuración.
+```
+
+La arquitectura de cassettes permite iterar personajes rápidamente sin modificar el motor cognitivo. Se pueden definir múltiples personajes creando nuevas carpetas en `core/cassettes/`. 
+
+**Para cambiar el personaje activo**, existen dos opciones:
+1. Definir la variable de entorno `CASSETTE_ID` con el nombre de la carpeta (ej. `CASSETTE_ID=mi-personaje`).
+2. Modificar directamente el valor en `core/config/cassette-settings.js`.
 
 ---
 
@@ -182,6 +188,9 @@ Dos pipelines de inferencia independientes operan en paralelo:
 ## Configuración de entorno
 
 ```env
+# Configuración del personaje activo (nombre de la carpeta en core/cassettes)
+CASSETTE_ID=mi-personaje
+
 # Proveedor LLM principal
 GEMINI_API_KEY=
 GROQ_API_KEY=

@@ -10,7 +10,8 @@ const AdmZip = require('adm-zip');
 // URL de descarga directa de Google Drive
 const DRIVE_FILE_ID = '1dXFbKbAHmzsKAzF4X0ECkygclsFZBBJu';
 const CASSETTES_DIR = path.join(__dirname, '..', 'core', 'cassettes');
-const CASSETTE_CHECK = path.join(CASSETTES_DIR, 'pelaosniper', 'core-engram.yaml');
+const cassetteSettings = require('../core/config/cassette-settings');
+const CASSETTE_CHECK = path.join(CASSETTES_DIR, cassetteSettings.cassette, 'core-engram.yaml');
 
 /**
  * Descarga archivo desde Google Drive usando fetch nativo

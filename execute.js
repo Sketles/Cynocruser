@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 // ╔════════════════════════════════════════════════════════════════════╗
-// ║                    CYNOCRUSER - Ψ-ORGAN CLI v2.0                   ║
-// ║                     Beautiful Chat Interface                        ║
+// ║                    CYNOCRUSER - Ψ-ORGAN CLI v2.0                   ║║
 // ╚════════════════════════════════════════════════════════════════════╝
 
 require('dotenv').config();

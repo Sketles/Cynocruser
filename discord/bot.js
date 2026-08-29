@@ -94,8 +94,8 @@ async function initialize() {
         cassetteId: cassetteId,
         name: cassette.engram.identity?.name || 'AI',
         fullName: cassette.engram.identity?.full_name || '',
-        // FORZAR COMANDO "pelao"
-        commandName: 'pelao',
+        // El comando usa el nombre del cassette sin espacios (ej: /pelaosniper, /mipersonaje)
+        commandName: cassetteId.toLowerCase().replace(/[^a-z0-9]/g, ''),
         commandDescription: `Habla con ${cassette.engram.identity?.name || 'AI'}`,
         ai: {
             model: 'gemini-2.0-flash',

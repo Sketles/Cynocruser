@@ -16,8 +16,8 @@ module.exports = {
     builders: {
 
         v1: {
-            file: 'PromptBuilder-V1-Somalia.js',
-            description: 'Full Prompt primera version Somalia (~14k tokens)',
+            file: 'promptBuilder.v1.js',
+            description: 'Prompt completo v1 (~14k tokens). XML structure, Umwelt + narrativa IA.',
             lines: '~1294',
             features: [
                 'XML Structure completo',
@@ -27,8 +27,8 @@ module.exports = {
         },
 
         v1f1: {
-            file: 'promptBuilderV1F1-Somalia.js',
-            description: 'V1 curado 8.5% de reducción de tokens y redundancias',
+            file: 'promptBuilder.v1f1.js',
+            description: 'V1 curado — 8.5% menos tokens, sin redundancias.',
             lines: '~1260',
             features: [
                 'Todo de v1',
@@ -40,7 +40,7 @@ module.exports = {
 
         lite: {
             file: 'promptBuilder.lite.js',
-            description: 'Reduccion del 70% de tokens de V1 modelo ligero',
+            description: 'Versión ligera — 70% menos tokens. Solo lo esencial, sin Umwelt.',
             lines: '~200',
             features: [
                 'Solo lo esencial',
