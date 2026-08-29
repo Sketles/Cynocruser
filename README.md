@@ -2,7 +2,7 @@
 
 <img src="logo.jpg" alt="Cynocruser Logo" width="160" />
 
-# Cynocruser Ψ
+# Cynocruser
 
 **Motor de Personajes Cognitivos basado en el Modelo Psi-Organ (Marco SiMA)**
 
@@ -285,3 +285,23 @@ El sistema está diseñado para despliegue en contenedores sobre [Railway](https
 - Damasio, A. (1994). *El error de Descartes: La emoción, la razón y el cerebro humano.* Crítica.
 - von Uexküll, J. (1934). *Incursión en los mundos de los animales y los hombres.* Springer.
 - Freud, S. (1911). *Formulaciones sobre los dos principios del acaecer psíquico.* Obras Completas, Vol. 12.
+
+---
+
+## ¿Qué es esto, en definitiva?
+
+Es una pregunta legítima.
+
+A simple vista, Cynocruser es un bot de Discord. Entras a un canal de voz, invocas el comando, y comienza a escucharte. Te escucha en tiempo real, procesa lo que dices y te responde con una voz — no una voz sintética genérica, sino una voz clonada, con timbre, cadencia y carácter propios del personaje que habita el sistema.
+
+Pero lo que ocurre por debajo no es un chatbot respondiendo desde un guión estático.
+
+Antes de que el modelo de lenguaje reciba tu mensaje, el sistema ha procesado internamente una cadena de eventos que ningún prompt convencional contempla: los tanques de energía y afiliación del agente han decaído desde la última interacción; el módulo de percepción ha clasificado el tono de tu mensaje; el Yo ha evaluado si activar un mecanismo de defensa o responder con proceso secundario; la memoria ha recuperado marcadores somáticos de episodios anteriores; y el Umwelt ha generado una narrativa del mundo circundante — la hora, el clima, el entorno físico donde el personaje "existe" — para contextualizar su estado presente.
+
+Solo entonces se construye el prompt. Y desde ese prompt, habla.
+
+El resultado es un agente que no siempre responde igual a la misma pregunta. Que tiene días mejores y peores. Que puede estar cansado, o necesitar conexión, o ponerse defensivo si lo presionas. Que escucha lo que dices y construye una respuesta coherente con quién es, con cómo se siente en ese momento, y con lo que ha vivido en esa conversación.
+
+No es inteligencia artificial general. No es una persona.
+
+Es algo más específico y, posiblemente, más interesante: un sistema que demuestra que la *coherencia psicológica* en un agente conversacional no es una cuestión de cuántos parámetros tiene el modelo, sino de qué arquitectura envuelve su cognición.
