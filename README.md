@@ -233,7 +233,7 @@ npm run prompt:umwelt  # Salida narrativa del Umwelt
 
 ## Despliegue en producción
 
-El sistema está diseñado para despliegue en contenedores sobre [Railway](https://railway.app). Al iniciar, `discord/bootstrap.js` aprovisiona los archivos de cassette desde un endpoint configurado en Google Drive, permitiendo que los datos del personaje permanezcan externos al repositorio y se actualicen de forma independiente de los despliegues de la aplicación.
+El sistema está diseñado para despliegue en contenedores sobre [Railway](https://railway.app), aunque puede ejecutarse en cualquier entorno con soporte para Node.js — incluyendo un servidor backend propio (VPS, instancia EC2, servidor dedicado o cualquier host con acceso a terminal). Al iniciar, `discord/bootstrap.js` aprovisiona los archivos de cassette desde un endpoint configurado en Google Drive, permitiendo que los datos del personaje permanezcan externos al repositorio y se actualicen de forma independiente de los despliegues de la aplicación.
 
 ---
 
