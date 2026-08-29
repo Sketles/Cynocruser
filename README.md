@@ -1,258 +1,259 @@
-# 🧠 CYNOCRUSER — Ψ-Organ AI Character Engine
+# Cynocruser
 
-> **Motor de personalidad artificial basado en el modelo SiMA (Ψ-Organ)**  
-> Simula una mente con necesidades, emociones y comportamientos dinámicos. Se despliega como **Bot de Discord** con voz clonada.
+**Cognitive Character Engine based on the Psi-Organ Model (SiMA Framework)**
 
----
-
-## ¿Qué hace este proyecto?
-
-Cynocruser es un sistema de IA conversacional que va más allá de un chatbot típico. Implementa el modelo **Ψ-Organ** (basado en Dietrich, 2023 — *"The Ψ-Organ in a Nutshell"*), que simula una psique completa con:
-
-- **Necesidades homeostáticas** que se vacían con el tiempo (energía, integridad, afiliación, certeza, competencia)
-- **Percepción emocional** de los mensajes del usuario (ataques, afecto, ambigüedad, desafíos...)
-- **Mecanismos de defensa psíquica** (evitación somática, represión, modo primario puro...)
-- **Memoria episódica** con marcadores somáticos
-- **Conciencia del mundo circundante** (Umwelt) con narrativa fenomenológica generada por IA
-- **Voz clonada** que habla en canales de Discord usando Hume AI
-
-Todo esto alimenta un **system prompt dinámico** que cambia en cada mensaje según el estado interno del personaje, creando una conversación genuinamente viva e impredecible.
+A research-oriented artificial intelligence system that implements a computational model of the human psyche. Cynocruser simulates dynamic mental states, homeostatic drives, and psychic defense mechanisms to generate contextually adaptive conversational agents, deployed as a real-time voice-capable Discord bot.
 
 ---
 
-## Arquitectura
+## Overview
+
+Cynocruser operationalizes the **Psi-Organ model** (Dietrich, 2023 — *"The Psi-Organ in a Nutshell"*), a neuro-cognitive architecture that models the mind as a layered biological system governed by somatic needs, symbolic perception, and ego-mediated decision processes.
+
+Unlike conventional large language model (LLM) wrappers, this system does not rely on a static system prompt. Instead, it constructs a **dynamic, state-dependent prompt** on every inference cycle, encoding the agent's current physiological state, emotional valence, active defense mechanisms, world context, and episodic memory traces. The result is an agent whose behavioral profile is non-deterministic, internally consistent, and sensitive to interaction history.
+
+---
+
+## Scientific Background
+
+The architecture draws from several disciplines:
+
+- **Psychodynamic theory:** Implementation of primary and secondary process thinking, somatic markers, and ego defense mechanisms (repression, somatic avoidance, projection) as discrete computational modules.
+- **Homeostatic modeling:** Five independent drive tanks (energy, integrity, affiliation, certainty, competence) decay over time following parameterizable depletion curves. Critical thresholds trigger behavioral mode shifts analogous to motivational urgency in biological systems.
+- **Phenomenological world modeling (Umwelt):** Inspired by Jakob von Uexküll's concept of the species-specific perceptual world, the system maintains a generative narrative layer that contextualizes the agent's environment (temporal, meteorological, and social context) using a secondary LLM inference pipeline.
+- **Episodic memory with somatic marking:** Damasio's somatic marker hypothesis is partially implemented through a memory module that tags episodic records with affective valence and physiological state at encoding time, influencing subsequent retrieval and behavioral weighting.
+
+---
+
+## Architecture
 
 ```
 cynocruser/
-├── core/                        # Motor cognitivo central
-│   ├── organo-sima/             # Ψ-Organ: el cerebro del sistema
-│   │   ├── L1_hypothalamus/     # Soma: tanques de necesidades
-│   │   ├── L2_thalamus/         # Percepción y simbolización
-│   │   ├── L3_cortex/           # Ego: proceso primario/secundario
-│   │   ├── hippocampus/         # Memoria episódica + marcadores somáticos
-│   │   └── umwelt/              # Simulador del mundo circundante
-│   ├── builders/                # Constructores del system prompt
-│   │   ├── simaPromptBuilder.js # Builder principal (SiMA v2)
-│   │   └── umweltPromptBuilder.js
-│   ├── cassettes/               # Datos del personaje (YAML)
-│   │   └── pelaosniper/         # Personaje activo
+├── core/
+│   ├── organo-sima/
+│   │   ├── L1_hypothalamus/     # Soma: homeostatic drive management
+│   │   ├── L2_thalamus/         # Perception: symbolic classification of input
+│   │   ├── L3_cortex/           # Ego: primary/secondary process + decision engine
+│   │   ├── hippocampus/         # Episodic memory with somatic markers
+│   │   └── umwelt/              # World simulator: phenomenological context generation
+│   ├── builders/                # System prompt construction layer
+│   ├── cassettes/               # YAML character definitions (engram, lexicon, organ config)
 │   ├── services/
-│   │   ├── ai-client.js         # Cliente multi-proveedor de IA
-│   │   ├── tts.js               # Text-to-Speech (Hume AI / ElevenLabs)
-│   │   └── weatherService.js    # Datos de clima para el Umwelt
-│   └── config/                  # Configuración de IA, cassette, TTS, prompts
-│
-├── discord/                     # Bot de Discord
-│   ├── bot.js                   # Entry point del bot
-│   ├── bootstrap.js             # Descarga cassettes desde Google Drive (Railway)
-│   ├── commands/factory.js      # Generador de comandos slash (/pelao)
-│   └── services/voiceChannel.js # Manejo de canales de voz
-│
-├── scripts/                     # Herramientas de desarrollo
-│   ├── organ.js                 # Prueba el Ψ-Organ en consola
-│   ├── prompt.js                # Inspecciona el system prompt generado
-│   ├── umwelt.js                # Prueba la narrativa del mundo
-│   ├── info.js                  # Info del sistema
-│   └── test-ai-providers.js     # Prueba todos los providers de IA
-│
-├── execute.js                   # CLI interactiva (modo local/desarrollo)
-└── docs/                        # Documentación técnica y de diseño
+│   │   ├── ai-client.js         # Multi-provider LLM abstraction layer
+│   │   ├── tts.js               # Text-to-speech synthesis (Hume AI / ElevenLabs)
+│   │   └── weatherService.js    # Environmental data feed for Umwelt
+│   └── config/
+├── discord/
+│   ├── bot.js                   # Discord gateway client and event dispatcher
+│   ├── bootstrap.js             # Remote cassette provisioning (Google Drive / Railway)
+│   ├── commands/factory.js      # Slash command generation and interaction handling
+│   └── services/voiceChannel.js # Voice channel management and audio streaming
+├── scripts/                     # Development and diagnostic utilities
+├── execute.js                   # Interactive CLI for local testing
+└── docs/                        # Research notes and architectural documentation
 ```
 
 ---
 
-## El Ψ-Organ: Cómo funciona la mente
+## Inference Pipeline
 
-Cada mensaje del usuario dispara este flujo:
+Each user message triggers the following deterministic sequence:
 
 ```
-Usuario escribe
-      ↓
-L1 Soma: tick metabólico (los tanques bajan con el tiempo)
-      ↓
-L2 Percepción: clasifica el mensaje (ATTACK / AFFECTION / AMBIGUITY / CHALLENGE / NEUTRAL...)
-      ↓
-Soma se actualiza (un ataque daña integridad; afecto sube afiliación)
-      ↓
-L3 Ego: Proceso Primario → Proceso Secundario → Decisión de conducta
-      ↓
-Memoria: registra el episodio con marcadores somáticos
-      ↓
-Umwelt: genera contexto narrativo del mundo (clima, hora, entorno)
-      ↓
-System Prompt dinámico → IA genera respuesta
+Input received
+    |
+    v
+L1 — Metabolic tick: drive tanks depleted by baseline decay rates
+    |
+    v
+L2 — Perceptual classification: input mapped to stimulus type
+     (ATTACK / AFFECTION / AMBIGUITY / REJECTION / CHALLENGE / NEUTRAL)
+    |
+    v
+L1 — Somatic update: drive tanks modified by stimulus-specific impact functions
+    |
+    v
+L3 — Ego processing:
+       Primary process  →  affective, associative, drive-dominated response
+       Secondary process →  reality-adapted, socially regulated response
+       Decision engine  →  behavioral mode selection + defense mechanism activation
+    |
+    v
+Hippocampus — Episode recorded with somatic and affective markers
+    |
+    v
+Umwelt — Phenomenological world context generated via secondary LLM inference
+    |
+    v
+Prompt builder — Dynamic system prompt assembled from all subsystem outputs
+    |
+    v
+LLM inference — Response generated under the constructed cognitive context
 ```
-
-### Tanques del Soma
-
-| Tanque | Descripción |
-|--------|-------------|
-| `energía` | Se agota con cada interacción |
-| `integridad` | Daña con ataques, insultos |
-| `afiliación` | Necesita interacción social |
-| `certeza` | Baja con ambigüedad/confusión |
-| `competencia` | Sube con desafíos bien resueltos |
-
-Cuando los tanques caen a niveles críticos, el personaje cambia de comportamiento de forma automática.
 
 ---
 
-## Cassettes
+## Somatic Drive System
 
-Los **cassettes** son los archivos YAML que definen la identidad del personaje:
+| Drive | Baseline | Depletion Trigger | Critical Threshold |
+|-------|----------|-------------------|-------------------|
+| Energy | 100 | Per interaction | < 15 |
+| Integrity | 100 | Hostile input | < 30 |
+| Affiliation | 70 | Social inactivity | < 20 |
+| Certainty | 80 | Ambiguous input | Configurable |
+| Competence | 75 | Unresolved challenges | Configurable |
 
-```
-core/cassettes/pelaosniper/
-├── core-engram.yaml       # Identidad, historia, valores, forma de hablar
-├── core-lexicon.yaml      # Vocabulario característico, muletillas, patrones
-├── core-sima-organ.yaml   # Config del Ψ-Organ: tanques, mecanismos de defensa
-└── core-umwelt.yaml       # Config del mundo: ciudad, clima, contexto vital
-```
-
-Para cambiar de personaje, basta con cambiar `cassette` en `core/config/cassette-settings.js`.
+When drives breach critical thresholds, the system transitions to altered behavioral modes: heightened primary process dominance, shortened response length, increased use of psychic defenses, or spontaneous proactive output.
 
 ---
 
-## Bot de Discord
+## Character Definition — Cassette System
 
-El bot expone un comando slash `/pelao` que permite:
+Character identities are defined through structured YAML manifests called **cassettes**, separating behavioral configuration from engine logic:
 
-- **`/pelao hablar`** — El bot se une al canal de voz y responde con voz clonada (TTS via Hume AI)
-- **`/pelao textear`** — Responde solo por texto
-- **`/pelao audiorepite`** — Repite texto como audio MP3
-- **`/pelao desconectar`** — Sale del canal de voz
-- **Auto-desconexión** — Si todos se van del canal, el bot se desconecta solo
+```
+core/cassettes/<character_id>/
+├── core-engram.yaml        # Identity, biography, values, communication style
+├── core-lexicon.yaml       # Idiolect, characteristic vocabulary, linguistic patterns
+├── core-sima-organ.yaml    # Drive baselines, defense inventory, behavioral parameters
+└── core-umwelt.yaml        # World configuration: location, schedule, social context
+```
 
-El bot se despliega en **Railway** con los cassettes descargados automáticamente desde Google Drive al iniciar.
+The cassette architecture enables rapid character iteration without modifying the cognitive engine. Multiple characters can be defined and activated by changing a single configuration value.
 
 ---
 
-## Providers de IA
+## Deployment — Discord Integration
 
-El sistema soporta múltiples proveedores de forma intercambiable:
+The system is deployed as a Discord application implementing voice and text modalities:
 
-| Provider | Modelos destacados |
-|----------|--------------------|
-| **Gemini** | `gemini-2.5-flash`, `gemini-2.5-pro` |
-| **Groq** | `llama-3.3-70b-versatile`, `qwen3-32b` |
-| **SambaNova** | `DeepSeek-V3.1`, `Qwen3-235B` |
-| **OpenRouter** | Acceso a Claude, GPT-4o, modelos free |
+**Slash command interface (`/pelao`):**
 
-La **IA principal** genera las respuestas del personaje. La **mini-IA Umwelt** (separada, más pequeña/barata) genera la narrativa del mundo circundante.
+| Subcommand | Description |
+|------------|-------------|
+| `hablar` | Joins the user's voice channel; all responses synthesized as cloned-voice audio |
+| `textear` | Text-only conversational mode |
+| `audiorepite` | Synthesizes arbitrary input text as audio output |
+| `desconectar` | Terminates voice channel session |
+
+**Behavioral features:**
+- Voice synthesis uses a cloned voice model via Hume AI Octave API, maintaining perceptual consistency with the character identity.
+- Auto-disconnect logic monitors voice channel occupancy; the bot exits upon detecting an empty channel.
+- Per-user conversation history is maintained across the session with configurable memory window (default: 20 exchanges).
 
 ---
 
-## Configuración rápida
+## LLM Provider Architecture
 
-### 1. Instalar dependencias
+The `AIClient` module implements a provider-agnostic abstraction supporting runtime switching between inference backends:
 
-```bash
-npm install
-```
+| Provider | Protocol | Representative Models |
+|----------|----------|-----------------------|
+| Google Gemini | Native Gemini API | gemini-2.5-flash, gemini-2.5-pro |
+| Groq | OpenAI-compatible | llama-3.3-70b-versatile, qwen3-32b |
+| SambaNova | OpenAI-compatible | DeepSeek-V3.1, Qwen3-235B |
+| OpenRouter | OpenAI-compatible | Aggregated model access |
 
-### 2. Configurar variables de entorno
+Two independent inference pipelines operate in parallel:
+- **Primary inference:** Generates character responses under the full dynamic system prompt.
+- **Umwelt inference:** Lightweight secondary pipeline (configurable provider) generates phenomenological world narratives without loading the primary prompt.
 
-```bash
-cp .env.example .env
-# Editar .env con tus API keys
-```
+---
 
-Variables clave:
+## Environment Configuration
 
 ```env
-# IA Principal (elige uno)
-GEMINI_API_KEY=...
-GROQ_API_KEY=...
-SAMBANOVA_API_KEY=...
-OPENROUTER_API_KEY=...
+# Primary LLM provider
+GEMINI_API_KEY=
+GROQ_API_KEY=
+SAMBANOVA_API_KEY=
+OPENROUTER_API_KEY=
 
-# TTS (voz)
-HUME_API_KEY=...
-HUME_SECRET_KEY=...
-VOICE_ID_PELAO=...     # ID de la voz clonada en Hume AI
+# Voice synthesis
+HUME_API_KEY=
+HUME_SECRET_KEY=
+VOICE_ID_PELAO=
 
-# Discord
-DISCORD_TOKEN=...
-CLIENT_ID=...
-GUILD_ID=...           # Guild para registro de comandos (vacío = global)
+# Discord application
+DISCORD_TOKEN=
+CLIENT_ID=
+GUILD_ID=
 
-# Timezone (importante para Umwelt en Railway)
-TZ="America/Santiago"
+# System
+TZ=America/Santiago
 ```
 
-### 3. Ejecutar
+---
+
+## Development Interface
 
 ```bash
-# Bot de Discord (producción)
-npm start
+# Install dependencies
+npm install
 
-# CLI interactiva (desarrollo/pruebas)
+# Interactive CLI (local character session)
 npm run dev
 
-# CLI con debug del system prompt
+# CLI with system prompt inspection
 npm run debug
+
+# Discord bot with hot-reload
+npm run dev:bot
+
+# Run bot in production mode
+npm start
+
+# Diagnostic utilities
+npm run info           # System configuration summary
+npm run test:ia        # Provider connectivity test
+npm run prompt:full    # Full system prompt output
+npm run prompt:umwelt  # Umwelt narrative output
 ```
 
 ---
 
-## Scripts de desarrollo
+## Production Deployment
 
-| Comando | Descripción |
-|---------|-------------|
-| `npm run dev` | CLI interactiva con el personaje |
-| `npm run debug` | CLI con system prompt visible |
-| `npm run dev:bot` | Bot de Discord con hot-reload |
-| `npm run prompt:organ` | Muestra el output del Ψ-Organ |
-| `npm run prompt:full` | Muestra el system prompt completo |
-| `npm run prompt:umwelt` | Prueba la narrativa Umwelt |
-| `npm run test:ia` | Prueba todos los providers |
-| `npm run info` | Info del sistema y configuración |
+The system is designed for containerized deployment on [Railway](https://railway.app). On startup, `discord/bootstrap.js` provisions the cassette files from a configured Google Drive endpoint, enabling character data to remain external to the repository and updated independently of application deployments.
 
 ---
 
-## Comandos CLI (modo `npm run dev`)
+## Potential Research and Applied Use Cases
 
-| Comando | Descripción |
-|---------|-------------|
-| `/info` | Ver proveedor, modelo y cassette activos |
-| `/estado` | Ver los tanques del Ψ-Organ en tiempo real |
-| `/help` | Lista de comandos |
-| `/clear` | Limpiar pantalla |
-| `/salir` | Salir |
+- **Computational psychodynamics:** Empirical testing of psychoanalytic constructs (somatic markers, defense mechanisms, primary process) through behavioral measurement in conversational settings.
+- **Affective computing:** Benchmark platform for evaluating whether drive-state conditioning produces statistically measurable shifts in language model output characteristics.
+- **Human-computer interaction research:** Study of long-term user attachment and parasocial relationship formation with agents exhibiting simulated homeostatic needs.
+- **Synthetic character design:** Production pipeline for persistent AI characters in entertainment, game development, or interactive narrative, where behavioral consistency across sessions is required.
+- **Clinical simulation:** Prototype for training applications requiring agents that exhibit psychologically authentic responses to challenging interpersonal stimuli.
 
 ---
 
-## Despliegue en Railway
-
-El proyecto está pensado para desplegarse en [Railway](https://railway.app):
-
-1. Subir el repo
-2. Configurar las variables de entorno en Railway
-3. El script `discord/bootstrap.js` descarga automáticamente los cassettes desde Google Drive al iniciar
-4. El comando de inicio es `node discord/bot.js` (`npm start`)
-
-> **Nota:** Los cassettes están en `.gitignore` por privacidad. Al desplegarse, el bot los descarga del Drive configurado en `bootstrap.js`.
-
----
-
-## Requisitos
+## Technical Requirements
 
 - Node.js >= 18.0.0
-- API Key de al menos un proveedor de IA (Gemini, Groq, SambaNova u OpenRouter)
-- Para voz: API Key de Hume AI + Voice ID clonada
-- Para Discord: Token de bot + Client ID
+- Active API credentials for at least one supported LLM provider
+- Hume AI credentials and a registered voice clone for voice-enabled deployment
+- Discord application token and registered bot
 
 ---
 
-## Stack técnico
+## Stack
 
-- **Runtime:** Node.js 18+
-- **IA:** Google Gemini, Groq, SambaNova, OpenRouter (via fetch nativo)
-- **TTS:** Hume AI (Octave 2) / ElevenLabs
-- **Discord:** discord.js v14, @discordjs/voice
-- **Config:** YAML (cassettes), JS (settings), dotenv
-- **CLI:** chalk, boxen, ora, figlet
+| Layer | Technology |
+|-------|------------|
+| Runtime | Node.js 18+ |
+| LLM inference | Google Gemini API, Groq, SambaNova, OpenRouter |
+| Voice synthesis | Hume AI Octave 2, ElevenLabs |
+| Discord integration | discord.js v14, @discordjs/voice |
+| Character configuration | YAML |
+| Environment | dotenv |
+| CLI interface | chalk, boxen, ora, figlet |
 
 ---
 
-*"La diferencia entre un chatbot y Cynocruser es que Cynocruser tiene hambre."*
+## References
+
+- Dietrich, A. (2023). *The Psi-Organ in a Nutshell.* Conceptual framework for layered cognitive modeling.
+- Damasio, A. (1994). *Descartes' Error: Emotion, Reason, and the Human Brain.* Putnam.
+- von Uexküll, J. (1934). *A Foray into the Worlds of Animals and Humans.* Springer.
+- Freud, S. (1911). *Formulations on the Two Principles of Mental Functioning.* Standard Edition, Vol. 12.
