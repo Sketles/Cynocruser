@@ -1,259 +1,259 @@
 # Cynocruser
 
-**Cognitive Character Engine based on the Psi-Organ Model (SiMA Framework)**
+**Motor de Personajes Cognitivos basado en el Modelo Psi-Organ (Marco SiMA)**
 
-A research-oriented artificial intelligence system that implements a computational model of the human psyche. Cynocruser simulates dynamic mental states, homeostatic drives, and psychic defense mechanisms to generate contextually adaptive conversational agents, deployed as a real-time voice-capable Discord bot.
-
----
-
-## Overview
-
-Cynocruser operationalizes the **Psi-Organ model** (Dietrich, 2023 — *"The Psi-Organ in a Nutshell"*), a neuro-cognitive architecture that models the mind as a layered biological system governed by somatic needs, symbolic perception, and ego-mediated decision processes.
-
-Unlike conventional large language model (LLM) wrappers, this system does not rely on a static system prompt. Instead, it constructs a **dynamic, state-dependent prompt** on every inference cycle, encoding the agent's current physiological state, emotional valence, active defense mechanisms, world context, and episodic memory traces. The result is an agent whose behavioral profile is non-deterministic, internally consistent, and sensitive to interaction history.
+Sistema de inteligencia artificial orientado a la investigación que implementa un modelo computacional de la psique humana. Cynocruser simula estados mentales dinámicos, pulsiones homeostáticas y mecanismos de defensa psíquica para generar agentes conversacionales adaptativos al contexto, desplegados como bot de Discord con capacidad de voz en tiempo real.
 
 ---
 
-## Scientific Background
+## Descripción general
 
-The architecture draws from several disciplines:
+Cynocruser operacionaliza el **modelo Psi-Organ** (Dietrich, 2023 — *"The Psi-Organ in a Nutshell"*), una arquitectura neurocognitiva que modela la mente como un sistema biológico en capas, gobernado por necesidades somáticas, percepción simbólica y procesos de decisión mediados por el Yo.
 
-- **Psychodynamic theory:** Implementation of primary and secondary process thinking, somatic markers, and ego defense mechanisms (repression, somatic avoidance, projection) as discrete computational modules.
-- **Homeostatic modeling:** Five independent drive tanks (energy, integrity, affiliation, certainty, competence) decay over time following parameterizable depletion curves. Critical thresholds trigger behavioral mode shifts analogous to motivational urgency in biological systems.
-- **Phenomenological world modeling (Umwelt):** Inspired by Jakob von Uexküll's concept of the species-specific perceptual world, the system maintains a generative narrative layer that contextualizes the agent's environment (temporal, meteorological, and social context) using a secondary LLM inference pipeline.
-- **Episodic memory with somatic marking:** Damasio's somatic marker hypothesis is partially implemented through a memory module that tags episodic records with affective valence and physiological state at encoding time, influencing subsequent retrieval and behavioral weighting.
+A diferencia de los envoltorios convencionales sobre modelos de lenguaje de gran escala (LLM), este sistema no depende de un prompt de sistema estático. En cambio, construye un **prompt dinámico, dependiente del estado interno**, en cada ciclo de inferencia: codifica el estado fisiológico actual del agente, la valencia emocional, los mecanismos de defensa activos, el contexto del mundo y las trazas de memoria episódica. El resultado es un agente cuyo perfil conductual es no determinista, internamente consistente y sensible al historial de interacción.
 
 ---
 
-## Architecture
+## Fundamentos científicos
+
+La arquitectura integra conceptos de múltiples disciplinas:
+
+- **Teoría psicodinámica:** Implementación del pensamiento de proceso primario y secundario, marcadores somáticos y mecanismos de defensa del Yo (represión, evitación somática, proyección) como módulos computacionales discretos.
+- **Modelado homeostático:** Cinco tanques de pulsión independientes (energía, integridad, afiliación, certeza, competencia) se depleccionan con el tiempo siguiendo curvas de desgaste parametrizables. Los umbrales críticos desencadenan cambios de modo conductual análogos a la urgencia motivacional en sistemas biológicos.
+- **Modelado fenomenológico del mundo (Umwelt):** Inspirado en el concepto de mundo perceptivo específico de la especie de Jakob von Uexküll, el sistema mantiene una capa narrativa generativa que contextualiza el entorno del agente (contexto temporal, meteorológico y social) mediante un pipeline de inferencia LLM secundario.
+- **Memoria episódica con marcadores somáticos:** La hipótesis del marcador somático de Damasio se implementa parcialmente a través de un módulo de memoria que etiqueta los registros episódicos con valencia afectiva y estado fisiológico en el momento de la codificación, influyendo en la recuperación posterior y en la ponderación conductual.
+
+---
+
+## Arquitectura
 
 ```
 cynocruser/
 ├── core/
 │   ├── organo-sima/
-│   │   ├── L1_hypothalamus/     # Soma: homeostatic drive management
-│   │   ├── L2_thalamus/         # Perception: symbolic classification of input
-│   │   ├── L3_cortex/           # Ego: primary/secondary process + decision engine
-│   │   ├── hippocampus/         # Episodic memory with somatic markers
-│   │   └── umwelt/              # World simulator: phenomenological context generation
-│   ├── builders/                # System prompt construction layer
-│   ├── cassettes/               # YAML character definitions (engram, lexicon, organ config)
+│   │   ├── L1_hypothalamus/     # Soma: gestión de pulsiones homeostáticas
+│   │   ├── L2_thalamus/         # Percepción: clasificación simbólica del input
+│   │   ├── L3_cortex/           # Yo: proceso primario/secundario + motor de decisión
+│   │   ├── hippocampus/         # Memoria episódica con marcadores somáticos
+│   │   └── umwelt/              # Simulador del mundo: generación de contexto fenomenológico
+│   ├── builders/                # Capa de construcción del system prompt
+│   ├── cassettes/               # Definiciones de personaje en YAML (engrama, léxico, config. del órgano)
 │   ├── services/
-│   │   ├── ai-client.js         # Multi-provider LLM abstraction layer
-│   │   ├── tts.js               # Text-to-speech synthesis (Hume AI / ElevenLabs)
-│   │   └── weatherService.js    # Environmental data feed for Umwelt
+│   │   ├── ai-client.js         # Capa de abstracción multi-proveedor LLM
+│   │   ├── tts.js               # Síntesis de texto a voz (Hume AI / ElevenLabs)
+│   │   └── weatherService.js    # Datos ambientales para el Umwelt
 │   └── config/
 ├── discord/
-│   ├── bot.js                   # Discord gateway client and event dispatcher
-│   ├── bootstrap.js             # Remote cassette provisioning (Google Drive / Railway)
-│   ├── commands/factory.js      # Slash command generation and interaction handling
-│   └── services/voiceChannel.js # Voice channel management and audio streaming
-├── scripts/                     # Development and diagnostic utilities
-├── execute.js                   # Interactive CLI for local testing
-└── docs/                        # Research notes and architectural documentation
+│   ├── bot.js                   # Cliente de gateway de Discord y despachador de eventos
+│   ├── bootstrap.js             # Aprovisionamiento remoto de cassettes (Google Drive / Railway)
+│   ├── commands/factory.js      # Generación de comandos slash y manejo de interacciones
+│   └── services/voiceChannel.js # Gestión de canales de voz y streaming de audio
+├── scripts/                     # Utilidades de desarrollo y diagnóstico
+├── execute.js                   # CLI interactiva para pruebas locales
+└── docs/                        # Notas de investigación y documentación arquitectónica
 ```
 
 ---
 
-## Inference Pipeline
+## Pipeline de inferencia
 
-Each user message triggers the following deterministic sequence:
+Cada mensaje del usuario dispara la siguiente secuencia determinista:
 
 ```
-Input received
+Input recibido
     |
     v
-L1 — Metabolic tick: drive tanks depleted by baseline decay rates
+L1 — Tick metabólico: tanques de pulsión depleccionados por tasas de decaimiento base
     |
     v
-L2 — Perceptual classification: input mapped to stimulus type
-     (ATTACK / AFFECTION / AMBIGUITY / REJECTION / CHALLENGE / NEUTRAL)
+L2 — Clasificación perceptual: input mapeado a tipo de estímulo
+     (ATAQUE / AFECTO / AMBIGUEDAD / RECHAZO / DESAFIO / NEUTRO)
     |
     v
-L1 — Somatic update: drive tanks modified by stimulus-specific impact functions
+L1 — Actualización somática: tanques modificados por funciones de impacto específicas al estímulo
     |
     v
-L3 — Ego processing:
-       Primary process  →  affective, associative, drive-dominated response
-       Secondary process →  reality-adapted, socially regulated response
-       Decision engine  →  behavioral mode selection + defense mechanism activation
+L3 — Procesamiento del Yo:
+       Proceso primario  →  respuesta afectiva, asociativa y dominada por pulsiones
+       Proceso secundario →  respuesta adaptada a la realidad y regulada socialmente
+       Motor de decisión  →  selección de modo conductual + activación de mecanismos de defensa
     |
     v
-Hippocampus — Episode recorded with somatic and affective markers
+Hipocampo — Episodio registrado con marcadores somáticos y afectivos
     |
     v
-Umwelt — Phenomenological world context generated via secondary LLM inference
+Umwelt — Contexto fenomenológico del mundo generado via inferencia LLM secundaria
     |
     v
-Prompt builder — Dynamic system prompt assembled from all subsystem outputs
+Constructor de prompt — System prompt dinámico ensamblado desde todas las salidas de subsistemas
     |
     v
-LLM inference — Response generated under the constructed cognitive context
+Inferencia LLM — Respuesta generada bajo el contexto cognitivo construido
 ```
 
 ---
 
-## Somatic Drive System
+## Sistema de pulsiones somáticas
 
-| Drive | Baseline | Depletion Trigger | Critical Threshold |
-|-------|----------|-------------------|-------------------|
-| Energy | 100 | Per interaction | < 15 |
-| Integrity | 100 | Hostile input | < 30 |
-| Affiliation | 70 | Social inactivity | < 20 |
-| Certainty | 80 | Ambiguous input | Configurable |
-| Competence | 75 | Unresolved challenges | Configurable |
+| Pulsión | Base | Detonante de deplección | Umbral crítico |
+|---------|------|------------------------|----------------|
+| Energía | 100 | Por interacción | < 15 |
+| Integridad | 100 | Input hostil | < 30 |
+| Afiliación | 70 | Inactividad social | < 20 |
+| Certeza | 80 | Input ambiguo | Configurable |
+| Competencia | 75 | Desafíos no resueltos | Configurable |
 
-When drives breach critical thresholds, the system transitions to altered behavioral modes: heightened primary process dominance, shortened response length, increased use of psychic defenses, or spontaneous proactive output.
-
----
-
-## Character Definition — Cassette System
-
-Character identities are defined through structured YAML manifests called **cassettes**, separating behavioral configuration from engine logic:
-
-```
-core/cassettes/<character_id>/
-├── core-engram.yaml        # Identity, biography, values, communication style
-├── core-lexicon.yaml       # Idiolect, characteristic vocabulary, linguistic patterns
-├── core-sima-organ.yaml    # Drive baselines, defense inventory, behavioral parameters
-└── core-umwelt.yaml        # World configuration: location, schedule, social context
-```
-
-The cassette architecture enables rapid character iteration without modifying the cognitive engine. Multiple characters can be defined and activated by changing a single configuration value.
+Cuando las pulsiones superan los umbrales críticos, el sistema transiciona a modos conductuales alterados: mayor dominancia del proceso primario, respuestas más breves, mayor uso de defensas psíquicas, o producción proactiva espontánea.
 
 ---
 
-## Deployment — Discord Integration
+## Definición de personaje — Sistema de cassettes
 
-The system is deployed as a Discord application implementing voice and text modalities:
+Las identidades de los personajes se definen mediante manifiestos YAML estructurados denominados **cassettes**, que separan la configuración conductual de la lógica del motor:
 
-**Slash command interface (`/pelao`):**
+```
+core/cassettes/<id_personaje>/
+├── core-engram.yaml        # Identidad, biografía, valores, estilo comunicativo
+├── core-lexicon.yaml       # Idiolecto, vocabulario característico, patrones lingüísticos
+├── core-sima-organ.yaml    # Bases de pulsión, inventario de defensas, parámetros conductuales
+└── core-umwelt.yaml        # Configuración del mundo: ubicación, horario, contexto social
+```
 
-| Subcommand | Description |
+La arquitectura de cassettes permite iterar personajes rápidamente sin modificar el motor cognitivo. Se pueden definir múltiples personajes y activar cualquiera cambiando un único valor de configuración.
+
+---
+
+## Despliegue — Integración con Discord
+
+El sistema se despliega como aplicación de Discord con modalidades de voz y texto:
+
+**Interfaz de comandos slash (`/pelao`):**
+
+| Subcomando | Descripción |
 |------------|-------------|
-| `hablar` | Joins the user's voice channel; all responses synthesized as cloned-voice audio |
-| `textear` | Text-only conversational mode |
-| `audiorepite` | Synthesizes arbitrary input text as audio output |
-| `desconectar` | Terminates voice channel session |
+| `hablar` | Se une al canal de voz del usuario; todas las respuestas se sintetizan como audio con voz clonada |
+| `textear` | Modo conversacional solo por texto |
+| `audiorepite` | Sintetiza texto arbitrario como salida de audio |
+| `desconectar` | Termina la sesión del canal de voz |
 
-**Behavioral features:**
-- Voice synthesis uses a cloned voice model via Hume AI Octave API, maintaining perceptual consistency with the character identity.
-- Auto-disconnect logic monitors voice channel occupancy; the bot exits upon detecting an empty channel.
-- Per-user conversation history is maintained across the session with configurable memory window (default: 20 exchanges).
-
----
-
-## LLM Provider Architecture
-
-The `AIClient` module implements a provider-agnostic abstraction supporting runtime switching between inference backends:
-
-| Provider | Protocol | Representative Models |
-|----------|----------|-----------------------|
-| Google Gemini | Native Gemini API | gemini-2.5-flash, gemini-2.5-pro |
-| Groq | OpenAI-compatible | llama-3.3-70b-versatile, qwen3-32b |
-| SambaNova | OpenAI-compatible | DeepSeek-V3.1, Qwen3-235B |
-| OpenRouter | OpenAI-compatible | Aggregated model access |
-
-Two independent inference pipelines operate in parallel:
-- **Primary inference:** Generates character responses under the full dynamic system prompt.
-- **Umwelt inference:** Lightweight secondary pipeline (configurable provider) generates phenomenological world narratives without loading the primary prompt.
+**Características conductuales:**
+- La síntesis de voz utiliza un modelo de voz clonada via la API Hume AI Octave, manteniendo consistencia perceptual con la identidad del personaje.
+- La lógica de desconexión automática monitorea la ocupación del canal de voz; el bot sale al detectar el canal vacío.
+- El historial de conversación por usuario se mantiene durante la sesión con ventana de memoria configurable (por defecto: 20 intercambios).
 
 ---
 
-## Environment Configuration
+## Arquitectura de proveedores LLM
+
+El módulo `AIClient` implementa una abstracción agnóstica al proveedor con soporte para cambio en tiempo de ejecución entre backends de inferencia:
+
+| Proveedor | Protocolo | Modelos representativos |
+|-----------|-----------|------------------------|
+| Google Gemini | API nativa Gemini | gemini-2.5-flash, gemini-2.5-pro |
+| Groq | Compatible OpenAI | llama-3.3-70b-versatile, qwen3-32b |
+| SambaNova | Compatible OpenAI | DeepSeek-V3.1, Qwen3-235B |
+| OpenRouter | Compatible OpenAI | Acceso agregado a modelos |
+
+Dos pipelines de inferencia independientes operan en paralelo:
+- **Inferencia principal:** Genera respuestas del personaje bajo el system prompt dinámico completo.
+- **Inferencia Umwelt:** Pipeline secundario ligero (proveedor configurable) que genera narrativas fenomenológicas del mundo sin cargar el prompt principal.
+
+---
+
+## Configuración de entorno
 
 ```env
-# Primary LLM provider
+# Proveedor LLM principal
 GEMINI_API_KEY=
 GROQ_API_KEY=
 SAMBANOVA_API_KEY=
 OPENROUTER_API_KEY=
 
-# Voice synthesis
+# Síntesis de voz
 HUME_API_KEY=
 HUME_SECRET_KEY=
 VOICE_ID_PELAO=
 
-# Discord application
+# Aplicación de Discord
 DISCORD_TOKEN=
 CLIENT_ID=
 GUILD_ID=
 
-# System
+# Sistema
 TZ=America/Santiago
 ```
 
 ---
 
-## Development Interface
+## Interfaz de desarrollo
 
 ```bash
-# Install dependencies
+# Instalar dependencias
 npm install
 
-# Interactive CLI (local character session)
+# CLI interactiva (sesión local con el personaje)
 npm run dev
 
-# CLI with system prompt inspection
+# CLI con inspección del system prompt
 npm run debug
 
-# Discord bot with hot-reload
+# Bot de Discord con hot-reload
 npm run dev:bot
 
-# Run bot in production mode
+# Bot en modo producción
 npm start
 
-# Diagnostic utilities
-npm run info           # System configuration summary
-npm run test:ia        # Provider connectivity test
-npm run prompt:full    # Full system prompt output
-npm run prompt:umwelt  # Umwelt narrative output
+# Utilidades de diagnóstico
+npm run info           # Resumen de configuración del sistema
+npm run test:ia        # Prueba de conectividad con proveedores
+npm run prompt:full    # Salida completa del system prompt
+npm run prompt:umwelt  # Salida narrativa del Umwelt
 ```
 
 ---
 
-## Production Deployment
+## Despliegue en producción
 
-The system is designed for containerized deployment on [Railway](https://railway.app). On startup, `discord/bootstrap.js` provisions the cassette files from a configured Google Drive endpoint, enabling character data to remain external to the repository and updated independently of application deployments.
-
----
-
-## Potential Research and Applied Use Cases
-
-- **Computational psychodynamics:** Empirical testing of psychoanalytic constructs (somatic markers, defense mechanisms, primary process) through behavioral measurement in conversational settings.
-- **Affective computing:** Benchmark platform for evaluating whether drive-state conditioning produces statistically measurable shifts in language model output characteristics.
-- **Human-computer interaction research:** Study of long-term user attachment and parasocial relationship formation with agents exhibiting simulated homeostatic needs.
-- **Synthetic character design:** Production pipeline for persistent AI characters in entertainment, game development, or interactive narrative, where behavioral consistency across sessions is required.
-- **Clinical simulation:** Prototype for training applications requiring agents that exhibit psychologically authentic responses to challenging interpersonal stimuli.
+El sistema está diseñado para despliegue en contenedores sobre [Railway](https://railway.app). Al iniciar, `discord/bootstrap.js` aprovisiona los archivos de cassette desde un endpoint configurado en Google Drive, permitiendo que los datos del personaje permanezcan externos al repositorio y se actualicen de forma independiente de los despliegues de la aplicación.
 
 ---
 
-## Technical Requirements
+## Aplicaciones potenciales e investigación
+
+- **Psicodinámica computacional:** Verificación empírica de constructos psicoanalíticos (marcadores somáticos, mecanismos de defensa, proceso primario) mediante medición conductual en entornos conversacionales.
+- **Computación afectiva:** Plataforma de referencia para evaluar si el condicionamiento por estado de pulsión produce cambios estadísticamente medibles en las características de salida de modelos de lenguaje.
+- **Investigación en interacción humano-computadora:** Estudio de la formación de apego a largo plazo y relaciones parasociales con agentes que exhiben necesidades homeostáticas simuladas.
+- **Diseño de personajes sintéticos:** Pipeline de producción para personajes de IA persistentes en entretenimiento, desarrollo de videojuegos o narrativa interactiva, donde se requiere consistencia conductual entre sesiones.
+- **Simulación clínica:** Prototipo para aplicaciones de entrenamiento que requieren agentes con respuestas psicológicamente auténticas ante estímulos interpersonales desafiantes.
+
+---
+
+## Requisitos técnicos
 
 - Node.js >= 18.0.0
-- Active API credentials for at least one supported LLM provider
-- Hume AI credentials and a registered voice clone for voice-enabled deployment
-- Discord application token and registered bot
+- Credenciales activas de al menos un proveedor LLM compatible
+- Credenciales de Hume AI y voz clonada registrada para despliegue con voz habilitada
+- Token de aplicación Discord y bot registrado
 
 ---
 
-## Stack
+## Stack tecnológico
 
-| Layer | Technology |
-|-------|------------|
+| Capa | Tecnología |
+|------|------------|
 | Runtime | Node.js 18+ |
-| LLM inference | Google Gemini API, Groq, SambaNova, OpenRouter |
-| Voice synthesis | Hume AI Octave 2, ElevenLabs |
-| Discord integration | discord.js v14, @discordjs/voice |
-| Character configuration | YAML |
-| Environment | dotenv |
-| CLI interface | chalk, boxen, ora, figlet |
+| Inferencia LLM | Google Gemini API, Groq, SambaNova, OpenRouter |
+| Síntesis de voz | Hume AI Octave 2, ElevenLabs |
+| Integración Discord | discord.js v14, @discordjs/voice |
+| Configuración de personajes | YAML |
+| Entorno | dotenv |
+| Interfaz CLI | chalk, boxen, ora, figlet |
 
 ---
 
-## References
+## Referencias
 
-- Dietrich, A. (2023). *The Psi-Organ in a Nutshell.* Conceptual framework for layered cognitive modeling.
-- Damasio, A. (1994). *Descartes' Error: Emotion, Reason, and the Human Brain.* Putnam.
-- von Uexküll, J. (1934). *A Foray into the Worlds of Animals and Humans.* Springer.
-- Freud, S. (1911). *Formulations on the Two Principles of Mental Functioning.* Standard Edition, Vol. 12.
+- Dietrich, A. (2023). *The Psi-Organ in a Nutshell.* Marco conceptual para modelado cognitivo por capas.
+- Damasio, A. (1994). *El error de Descartes: La emoción, la razón y el cerebro humano.* Crítica.
+- von Uexküll, J. (1934). *Incursión en los mundos de los animales y los hombres.* Springer.
+- Freud, S. (1911). *Formulaciones sobre los dos principios del acaecer psíquico.* Obras Completas, Vol. 12.
