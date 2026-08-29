@@ -1,4 +1,4 @@
-# Cynocruser
+# Cynocruser Ψ
 
 **Motor de Personajes Cognitivos basado en el Modelo Psi-Organ (Marco SiMA)**
 
