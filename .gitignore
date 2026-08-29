@@ -24,6 +24,12 @@ Thumbs.db
 
 # Cassettes incluidos en esta rama para deploy directo
 
+# Cassettes privados — NO subir al repositorio
+core/cassettes/pelaosniper/
+
+# El template público sí se trackea
+# core/cassettes/mi-personaje/ → incluido
+
 # Logs de prompts pueden contener datos sensibles
 scripts/promptconsole/
 
