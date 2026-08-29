@@ -127,7 +127,7 @@ La arquitectura de cassettes permite iterar personajes rápidamente sin modifica
 
 El sistema se despliega como aplicación de Discord con modalidades de voz y texto:
 
-**Interfaz de comandos slash (`/pelao`):**
+**Interfaz de comandos slash (`/<nombre_del_personaje>`):**
 
 | Subcomando | Descripción |
 |------------|-------------|
