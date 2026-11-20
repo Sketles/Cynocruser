@@ -16,7 +16,7 @@ module.exports = {
     builders: {
 
         v1: {
-            file: 'promptBuilder.v1.js',
+            file: 'PromptBuilder-V1-Somalia.js',
             description: 'Prompt completo v1 (~14k tokens). XML structure, Umwelt + narrativa IA.',
             lines: '~1294',
             features: [
@@ -27,7 +27,7 @@ module.exports = {
         },
 
         v1f1: {
-            file: 'promptBuilder.v1f1.js',
+            file: 'promptBuilderV1F1-Somalia.js',
             description: 'V1 curado — 8.5% menos tokens, sin redundancias.',
             lines: '~1260',
             features: [
