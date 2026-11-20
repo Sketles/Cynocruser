@@ -151,7 +151,14 @@ async function initialize() {
         // Registrar comandos
         const rest = new REST({ version: '9' }).setToken(config.token);
         try {
-            if (config.guildIds.length > 0) {
+            // Limpiar comandos globales viejos (ej: /pelao legacy)
+                await rest.put(
+                    Routes.applicationCommands(config.clientId),
+                    { body: [] }
+                );
+                console.log('🧹 Comandos globales limpiados');
+
+                if (config.guildIds.length > 0) {
                 for (const guildId of config.guildIds) {
                     await rest.put(
                         Routes.applicationGuildCommands(config.clientId, guildId),
