@@ -41,12 +41,12 @@ async function textToSpeech(text, options = {}) {
  * Noiz AI Text-to-Speech
  */
 async function noizTextToSpeech(text, options = {}) {
-    const apiKey = process.env.NOIZ_API_KEY;
+    const apiKey = process.env.NOIZ_API_KEY || process.env.VOZ_API_KEY;
     const config = ttsSettings.noiz || {};
     const voiceId = options.voiceId || config.voiceId || process.env.NOIZ_VOICE_ID || process.env.VOICE_ID_PELAO;
 
     if (!apiKey || !voiceId) {
-        throw new Error('NOIZ_API_KEY o NOIZ_VOICE_ID (o VOICE_ID_PELAO) no configurados');
+        throw new Error('NOIZ_API_KEY (o VOZ_API_KEY) ni VOICE_ID configurados');
     }
 
     console.log(`🗣️ [Noiz AI TTS] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" (Voice: ${voiceId})`);
