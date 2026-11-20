@@ -21,7 +21,7 @@ module.exports = {
     // ║                                                                       ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
-    provider: 'hume',
+    provider: process.env.TTS_PROVIDER || 'elevenlabs',
 
 
     // ╔═══════════════════════════════════════════════════════════════════════╗
@@ -80,8 +80,8 @@ module.exports = {
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
     elevenlabs: {
-        voiceId: 'TX3LPaxmHKxFdv7VOQHJ',
-        model: 'eleven_multilingual_v2',
+        voiceId: process.env.ELEVENLABS_VOICE_ID || process.env.VOICE_ID_PELAO || 'TX3LPaxmHKxFdv7VOQHJ',
+        model: process.env.ELEVENLABS_MODEL || 'eleven_multilingual_v2',
         stability: 0.5,
         similarityBoost: 0.75
     },
