@@ -13,15 +13,28 @@ module.exports = {
     // ╠═══════════════════════════════════════════════════════════════════════╣
     // ║                                                                       ║
     // ║   ┌─────────────┬────────────────────────────────────────────────┐    ║
-    // ║   │ 'hume'      │ Hume AI - Voz emocional expresiva              │    ║
+    // ║   │ 'noiz'      │ Noiz AI - Rápido, clonación y emoción          │    ║
     // ║   │ 'elevenlabs'│ ElevenLabs - Voces ultra realistas             │    ║
+    // ║   │ 'hume'      │ Hume AI (Descontinuado/Retirado)               │    ║
     // ║   │ 'openai'    │ OpenAI TTS - Simple y rapido                   │    ║
     // ║   │ 'none'      │ Desactivar TTS (solo texto)                    │    ║
     // ║   └─────────────┴────────────────────────────────────────────────┘    ║
     // ║                                                                       ║
     // ╚═══════════════════════════════════════════════════════════════════════╝
 
-    provider: process.env.TTS_PROVIDER || 'elevenlabs',
+    provider: process.env.TTS_PROVIDER || 'noiz',
+
+    // ╔═══════════════════════════════════════════════════════════════════════╗
+    // ║                         NOIZ AI CONFIG                                ║
+    // ╠═══════════════════════════════════════════════════════════════════════╣
+    // ║   API Keys en .env: NOIZ_API_KEY                                      ║
+    // ║   Voice ID en .env: NOIZ_VOICE_ID o VOICE_ID_PELAO                    ║
+    // ╚═══════════════════════════════════════════════════════════════════════╝
+
+    noiz: {
+        voiceId: process.env.NOIZ_VOICE_ID || process.env.VOICE_ID_PELAO,
+        outputFormat: 'mp3'
+    },
 
 
     // ╔═══════════════════════════════════════════════════════════════════════╗

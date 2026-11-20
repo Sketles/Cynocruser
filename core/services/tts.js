@@ -1,10 +1,11 @@
 // ╔════════════════════════════════════════════════════════════════╗
 // ║                      TTS SERVICE                               ║
-// ║              Text-to-Speech (Hume AI / ElevenLabs)             ║
+// ║          Text-to-Speech (Noiz AI / ElevenLabs / Hume)          ║
 // ╚════════════════════════════════════════════════════════════════╝
 
 const ttsSettings = require('../config/tts-settings');
 
+const NOIZ_API_URL = 'https://noiz.ai/v1/text-to-speech';
 const HUME_API_URL = 'https://api.hume.ai/v0/tts/file';
 const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
 
@@ -15,21 +16,61 @@ const ELEVENLABS_API_URL = 'https://api.elevenlabs.io/v1/text-to-speech';
  * @returns {Promise<Buffer>} Buffer del audio MP3
  */
 async function textToSpeech(text, options = {}) {
-    const provider = ttsSettings.provider || 'hume';
+    const provider = ttsSettings.provider || 'noiz';
 
     if (provider === 'none') {
         throw new Error('TTS desactivado en configuración');
     }
 
-    if (provider === 'hume') {
-        return humeTextToSpeech(text, options);
+    if (provider === 'noiz') {
+        return noizTextToSpeech(text, options);
     }
 
     if (provider === 'elevenlabs') {
         return elevenLabsTextToSpeech(text, options);
     }
 
+    if (provider === 'hume') {
+        return humeTextToSpeech(text, options);
+    }
+
     throw new Error(`Proveedor TTS no soportado: ${provider}`);
+}
+
+/**
+ * Noiz AI Text-to-Speech
+ */
+async function noizTextToSpeech(text, options = {}) {
+    const apiKey = process.env.NOIZ_API_KEY;
+    const config = ttsSettings.noiz || {};
+    const voiceId = options.voiceId || config.voiceId || process.env.NOIZ_VOICE_ID || process.env.VOICE_ID_PELAO;
+
+    if (!apiKey || !voiceId) {
+        throw new Error('NOIZ_API_KEY o NOIZ_VOICE_ID (o VOICE_ID_PELAO) no configurados');
+    }
+
+    console.log(`🗣️ [Noiz AI TTS] "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" (Voice: ${voiceId})`);
+
+    const formData = new FormData();
+    formData.append('text', text);
+    formData.append('voice_id', voiceId);
+    formData.append('output_format', config.outputFormat || 'mp3');
+
+    const response = await fetch(NOIZ_API_URL, {
+        method: 'POST',
+        headers: {
+            'Authorization': apiKey.trim()
+        },
+        body: formData
+    });
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`Noiz AI API: ${response.status} - ${error}`);
+    }
+
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
 }
 
 /**
